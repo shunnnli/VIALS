@@ -164,7 +164,7 @@ disp('----- Plot tongue trajectory -----');
 phase = 1;         % separate different lick phases or not
 figure
 
-% tpid = [2162 2566 1305 2409 2157; 2823 910 2442 1943 2626] + 17; % 12-070519-2, v1
+tpid = [2162 2566 1305 2409 2157; 2823 910 2442 1943 2626] + 17; % 12-070519-2, v1
 % tpid = [2841 2873 2880 2874 2856; 2568 2521 1142 2560 2601] + 17; % 12-070519-2, v2
 
 plotTongueTraj(phase,tpid,loc,tp);

@@ -41,6 +41,8 @@ end
 
 xlim([-iti/2 iti/2]);
 ylim([0 max(tpaligned(size(tpaligned,1),4),psaligned(size(psaligned,1),2))]);
+xlabel('Time from reward (s)');
+ylabel('Reward number');
 
 end
 

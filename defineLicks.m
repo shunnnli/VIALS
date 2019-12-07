@@ -5,7 +5,7 @@ function [tp] = defineLicks(loc,camdata,threshold)
 %   INPUT: loc, camdata
 %   OUPUT: 
 %       tp = [tpid, isLick, spoutContact, duration, ici,
-%               pathLen, amplitude (x,y,z), tpDevianceS/B, tpMax,
+%               pathLen, amplitude (x,y,z), tpDevianceS/B, tpMax (x,y,z),
 %               pPercent (15), pSpeed, ilmPercent, ilmSpeed, rPercent, rSpeed,
 %               mouthLocation (21-23), spout (24-26), 
 %               pStart (27), pEnd, ilmStart, ilmEnd, rStart, rEnd (32),
@@ -116,6 +116,7 @@ for cur = 1:size(loc,1)
         amplitude = max(tpRange(:,(6:8)));
         [phase,tpMax] = definePhase(tpRange,mouthLocation,camdata);
         
+        
         % Calculate tongue protrusion direction parameters
         spoutraw = [];
         if tongueOutFrame - 50 < 1
@@ -149,13 +150,6 @@ for cur = 1:size(loc,1)
                             dot([0 m2s(2:3)],[0 m2m(2:3)]));
         tpDevianceB = atan2d(norm(cross([m2s(1:2) 0],[m2m(1:2) 0])),...
                             dot([m2s(1:2) 0],[m2m(1:2) 0]));
-        
-%         spoutS = [0,spout(2:3)];
-%         spoutB = [spout(1:2),0];
-%         tpMaxS = [0,tpMax(2:3)];
-%         tpMaxB = [tpMax(1:2),0];
-%         tpDevianceS = atan2d(norm(cross(spoutS,tpMaxS)),dot(spoutS,tpMaxS));
-%         tpDevianceB = atan2d(norm(cross(spoutB,tpMaxB)),dot(spoutB,tpMaxB));
         
         
         % Check if camdata.licking recorded lick events

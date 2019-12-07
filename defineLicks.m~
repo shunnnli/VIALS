@@ -115,7 +115,6 @@ for cur = 1:size(loc,1)
         tpRange = loc((tongueOutFrame:tongueInFrame),:);
         amplitude = max(tpRange(:,(6:8)));
         [phase,tpMax] = definePhase(tpRange,mouthLocation,camdata);
-        tortuosity = calcTortuosity(tpRange,pathLen);
         
         % Calculate tongue protrusion direction parameters
         spoutraw = [];
@@ -151,6 +150,9 @@ for cur = 1:size(loc,1)
                             dot([0 m2s(2:3)],[0 m2m(2:3)]));
         tpDevianceB = atan2d(norm(cross([m2s(1:2) 0],[m2m(1:2) 0])),...
                             dot([m2s(1:2) 0],[m2m(1:2) 0]));
+                        
+        % Tuo
+        
         
         % Check if camdata.licking recorded lick events
         if ~isempty(camdata.licking)

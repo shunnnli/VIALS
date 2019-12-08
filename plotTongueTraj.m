@@ -75,7 +75,7 @@ end
 
 grid on
 axis equal
-legend
+% legend
 
 end
 

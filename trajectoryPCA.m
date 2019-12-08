@@ -11,9 +11,9 @@ for i = 1:size(sessions,1)
     if isfile(tp_path)
         tp = readmatrix(tp_path);
         if version == 1
-            all = [all; tp(:,[6 10:14])];
+            all = [all; tp(:,[6 10 12:14])];
         else
-            all = [all; tp(:,[6 10:14 17])];
+            all = [all; tp(:,[6 10 12:14 17])];
         end
     else
         disp('tp.csv does not exist!');
@@ -25,11 +25,11 @@ disp(strcat('Total tongue protrusion analyzed:', num2str(size(all,1))));
 if version == 1
     [coeff,score,latent,tsquared,explained,mu] = pca(all);
     b = biplot(coeff(:,1:2),'scores',score(:,1:2), ...
-        'varlabels',{'pLen','tpDevS','tpDevB','tpMX','tpMY','tpMZ'});
+        'varlabels',{'pLen','tpDev','tpMX','tpMY','tpMZ'});
 else
     [coeff,score,latent,tsquared,explained,mu] = pca(all);
     b = biplot(coeff(:,1:2),'scores',score(:,1:2), 'varlabels',...
-        {'pLen','tpDevS','tpDevB','tpMX','tpMY','tpMZ','ilmPer'});
+        {'pLen','tpDev','tpMX','tpMY','tpMZ','ilmPer'});
 end
 
 % Full labels

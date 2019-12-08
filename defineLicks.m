@@ -9,8 +9,8 @@ function [tp] = defineLicks(loc,camdata,threshold)
 %               pPercent (15), pSpeed, ilmPercent, ilmSpeed, rPercent, rSpeed,
 %               mouthLocation (21-23), spout (24-26), 
 %               pStart (27), pEnd, ilmStart, ilmEnd, rStart, rEnd (32),
-%               tongueOutTime, tongueInTime, 
-%               tongueOutFrame, tongueInFrame, lastReward, spoutContactTime]
+%               tongueOutTime (33), tongueInTime, 
+%               tongueOutFrame (35), tongueInFrame, lastReward, spoutContactTime]
 
 %       ** : duration = tongueInTime - tongueOutTime
 %       ** : tongueOut/InFrame is based on camdata.times

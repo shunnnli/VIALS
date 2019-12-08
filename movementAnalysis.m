@@ -4,7 +4,7 @@ disp('----- Load loc and EMG data -----');
 sessions = ["11-062419-1"; "11-062819-1"; "12-070519-2"; "13-090919-1";...
     "14-091519-1"; "18-102119-1"; "18-102519-1"; "18-102519-2";...
     "19-111119-1"];
-session = sessions(2);
+session = sessions(3);
 disp(session);
 % Enter analysis window (in seconds)
 start = 0;
@@ -159,7 +159,7 @@ disp('----- Tongue Trajectory PCA -----');
 all = ["11-062419-1"; "11-062819-1"; "12-070519-2"; "13-090919-1";...
     "14-091519-1"; "18-102119-1"; "18-102519-1"; "18-102519-2";...
     "19-111119-1"];
-animal = all(2);
+animal = all(1);
 
 % 1 -> not including phase, 2 -> including phase
 version = 2;
@@ -172,11 +172,11 @@ disp('----- Plot tongue trajectory -----');
 phase = 1;         % separate different lick phases or not
 figure
 
-tpid = [8858 7195 2874];
+tpid = [2333];
 % tpid = [2162 2566 1305 2409 2157; 2823 910 2442 1943 2626] + 17; % 12-070519-2, v1
 % tpid = [2841 2873 2880 2874 2856; 2568 2521 1142 2560 2601] + 17; % 12-070519-2, v2
 
-plotTongueTraj(phase,tpid,loc,tp);
+plotTongueTraj(phase,tpid,loc,tp,2);
 
 %% Swallowing marker trajectories
 % --------------------- Laryngeal complex trajectory ---------------------
@@ -473,9 +473,18 @@ end
 % scatter(loc(floor:ceiling,10),loc(floor:ceiling,11));
 
 %% Test
-sessionlist = {'11-062819-1'; '11-062419-1'; '19-111119-1'};
-sessionarray = ["11-062819-1"; "11-062419-1"; "19-111119-1"];
-tp1 = strcat('Videos/',sessionarray(1),'/tp.csv');
-tp2 = strcat('Videos/',session,'/tp.csv');
-disp(tp1);
-test = readmatrix(tp1);
+if isnan(tp(5,27:32))
+    disp('err');
+end
+%% Session notes
+%{
+"11-062419-1"
+"11-062819-1"
+"12-070519-2"
+"13-090919-1"
+"14-091519-1"
+"18-102119-1"
+"18-102519-1"
+"18-102519-2"
+"19-111119-1"
+%}

@@ -14,14 +14,14 @@ function [] = plotTongueTraj(phase,tpid,loc,tp,plane)
 
 for i = 1:size(tpid,1)
     for j = 1:size(tpid,2)
-        spout = tp(tpid(i,j),(24:26));
-        whole = loc((tp(tpid(i,j),35):tp(tpid(i,j),36)),:);
+        spout = tp(tpid(i,j),(24:26));  
         
         % Separate different phases
         if ~isnan(tp(tpid(i,j),27:32))
             protrusion = loc((tp(tpid(i,j),27):tp(tpid(i,j),28)),:);
             ilm = loc((tp(tpid(i,j),29)-1:tp(tpid(i,j),30)+1),:);
             retraction = loc((tp(tpid(i,j),31):tp(tpid(i,j),32)),:);
+            whole = loc((tp(tpid(i,j),35):tp(tpid(i,j),36)),:);
         else
             phase = -1;
         end
@@ -41,60 +41,55 @@ for i = 1:size(tpid,1)
         if i == 1
             % Plot single tp type
             if size(tpid,1) == 1
+                if phase == -1
+                    % black, can't detect phase
+                    if plane == 0
+                        plot3(whole(:,6),whole(:,7),whole(:,8),...
+                            'k','LineWidth',2);
+                        hold on
+                    elseif plane == 1
+                        plot(whole(:,7),whole(:,8),...
+                            'k','LineWidth',2);
+                        hold on
+                    else
+                        plot(whole(:,6),whole(:,7),...
+                            'k','LineWidth',2);
+                        hold on
+                    end
+                end
                 if plane == 0
-                    if phase == -1
-                        % black, can't detect phase
-                        plot3(whole(:,6),whole(:,7),whole(:,8),...
-                            'k','LineWidth',2);
-                        hold on
-                    else
-                        plot3(protrusion(:,6),protrusion(:,7),protrusion(:,8),...
-                            'Color','#0072BD', 'DisplayName','Protrusion', 'LineWidth',2);
-                        hold on
-                        plot3(ilm(:,6),ilm(:,7),ilm(:,8),'Color','#D95319', ...
-                            'DisplayName','Interlick movement','LineWidth',2);
-                        hold on
-                        plot3(retraction(:,6),retraction(:,7),retraction(:,8),...
-                            'Color','#77AC30','DisplayName','Retraction','LineWidth',2);
-                        hold on
-                        continue
-                    end
+                    plot3(protrusion(:,6),protrusion(:,7),protrusion(:,8),...
+                        'Color','#0072BD', 'DisplayName','Protrusion', 'LineWidth',2);
+                    hold on
+                    plot3(ilm(:,6),ilm(:,7),ilm(:,8),'Color','#D95319', ...
+                        'DisplayName','Interlick movement','LineWidth',2);
+                    hold on
+                    plot3(retraction(:,6),retraction(:,7),retraction(:,8),...
+                        'Color','#77AC30','DisplayName','Retraction','LineWidth',2);
+                    hold on
+                    continue
                 elseif plane == 1
-                    if phase == -1
-                        % black, can't detect phase
-                        plot3(whole(:,6),whole(:,7),whole(:,8),...
-                            'k','LineWidth',2);
-                        hold on
-                    else
-                        plot(protrusion(:,7),protrusion(:,8),'Color','#0072BD',...
-                            'DisplayName','Protrusion', 'LineWidth',2);
-                        hold on
-                        plot(ilm(:,7),ilm(:,8),'Color','#D95319', ...
-                            'DisplayName','Interlick movement','LineWidth',2);
-                        hold on
-                        plot(retraction(:,7),retraction(:,8),'Color','#77AC30',...
-                            'DisplayName','Retraction','LineWidth',2);
-                        hold on
-                        continue
-                    end
+                    plot(protrusion(:,7),protrusion(:,8),'Color','#0072BD',...
+                        'DisplayName','Protrusion', 'LineWidth',2);
+                    hold on
+                    plot(ilm(:,7),ilm(:,8),'Color','#D95319', ...
+                        'DisplayName','Interlick movement','LineWidth',2);
+                    hold on
+                    plot(retraction(:,7),retraction(:,8),'Color','#77AC30',...
+                        'DisplayName','Retraction','LineWidth',2);
+                    hold on
+                    continue
                 else
-                    if phase == -1
-                        % black, can't detect phase
-                        plot3(whole(:,6),whole(:,7),whole(:,8),...
-                            'k','LineWidth',2);
-                        hold on
-                    else
-                        plot(protrusion(:,6),protrusion(:,7),'Color','#0072BD',...
-                            'DisplayName','Protrusion', 'LineWidth',2);
-                        hold on
-                        plot(ilm(:,6),ilm(:,7),'Color','#D95319', ...
-                            'DisplayName','Interlick movement','LineWidth',2);
-                        hold on
-                        plot(retraction(:,6),retraction(:,7),'Color','#77AC30',...
-                            'DisplayName','Retraction','LineWidth',2);
-                        hold on
-                        continue
-                    end
+                    plot(protrusion(:,6),protrusion(:,7),'Color','#0072BD',...
+                        'DisplayName','Protrusion', 'LineWidth',2);
+                    hold on
+                    plot(ilm(:,6),ilm(:,7),'Color','#D95319', ...
+                        'DisplayName','Interlick movement','LineWidth',2);
+                    hold on
+                    plot(retraction(:,6),retraction(:,7),'Color','#77AC30',...
+                        'DisplayName','Retraction','LineWidth',2);
+                    hold on
+                    continue
                 end
             end
             

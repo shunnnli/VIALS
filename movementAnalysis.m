@@ -6,6 +6,7 @@ sessions = ["11-062419-1"; "11-062819-1"; "12-070519-2"; "13-090919-1";...
     "19-111119-1"];
 session = sessions(3);
 disp(session);
+
 % Enter analysis window (in seconds)
 start = 0;
 stop = 9999;
@@ -18,7 +19,7 @@ bphigh = 3000;
 
 % Load single session data
 [camdata,loc] = loadLocData(session,start,stop,1);
-[tp,tpbout,lickbout,swallowbout] = loadLocAnalysis(session,loc,camdata,0);
+[tp,tpbout,lickbout,swallowbout] = loadLocAnalysis(session,loc,camdata,1);
 % [emg,emgenv] = loadEMG(bplow,bphigh,start,stop,camdata);
 
 % Reset tp.csv for multiple sessions
@@ -170,13 +171,14 @@ b_path = strcat('Videos/',session,'/','whole.fig');
 disp('----- Plot tongue trajectory -----');
 
 phase = 1;         % separate different lick phases or not
+disp(session);
+
 figure
-
-tpid = [2333];
+% tpid = [2333];
 % tpid = [2162 2566 1305 2409 2157; 2823 910 2442 1943 2626] + 17; % 12-070519-2, v1
-% tpid = [2841 2873 2880 2874 2856; 2568 2521 1142 2560 2601] + 17; % 12-070519-2, v2
+tpid = [2841 2873 2880 2874 2856; 2568 2521 1142 2560 2601] + 17; % 12-070519-2, v2
 
-plotTongueTraj(phase,tpid,loc,tp,2);
+plotTongueTraj(phase,tpid,loc,tp,0);
 
 %% Swallowing marker trajectories
 % --------------------- Laryngeal complex trajectory ---------------------

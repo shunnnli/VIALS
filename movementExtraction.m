@@ -1,6 +1,11 @@
 %% Load files
 % load session deeplabcut data
-session = '11-062419-1';
+sessions = ["11-062419-1"; "11-062819-1"; "12-070519-2"; "13-090919-1";...
+    "14-091519-1"; "18-102119-1"; "18-102519-1"; "18-102519-2";...
+    "19-111119-1"];
+session = sessions(3);
+disp(session);
+
 % 0 = no swallow
 % 1 = 'DLC_resnet50_swallowing-trackingSep8shuffle1_1030000.csv';
 % 2 = 'DeepCut_resnet50_swallow-trackingSep18shuffle1_1030000.csv';
@@ -34,8 +39,9 @@ bottomylen = 164;
 sxratio = 5/sidexlen;
 syratio = 0.9/sideylen;
 bxratio = 5/bottomxlen;
-byratio = 0.9/bottomylen
+byratio = 0.9/bottomylen;
 ratio = [sxratio;syratio;bxratio;byratio];
+noratio = [1;1;1;1];
 
 % Enter pixel height of two markers
 laryheight = 0; % 19-111119-1: 48.75
@@ -43,7 +49,7 @@ jawheight = 0; % 19-111119-1:23.12
 
 % Calibrate camera
 [side,bottom,swallow] = calibrateCamera(sideloc,bottomloc,swallowloc,...
-                            ratio,laryheight,jawheight);
+                            noratio,laryheight,jawheight);
 
 % construct marker position in 3D
 loc = construct3D(side,bottom,swallow);

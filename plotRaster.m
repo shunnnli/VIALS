@@ -1,4 +1,4 @@
-function rp = plotRaster(tp,pswallow,emgswallow,camdata)
+function [rp,psaligned,esaligned] = plotRaster(tp,pswallow,emgswallow,camdata)
 %UNTITLED5 Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -32,7 +32,7 @@ scatter(tpaligned(islick+1:size(tpaligned,1),5),...
     '.','MarkerEdgeColor','#0072BD');   % is lick
 hold on
 if ~isempty(pswallow)
-    scatter(psaligned(:,3),psaligned(:,2),'o','MarkerEdgeColor','#A2142F');
+    scatter(psaligned(:,3),psaligned(:,2),'or');
 end
 hold on
 if ~isempty(emgswallow)

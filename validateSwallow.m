@@ -1,6 +1,8 @@
 function [emgswallow] = validateSwallow(emgenv,loc,tp,camdata)
 % Find putative swallow based on EMG
 % find EMG envelope peak without tongue protrusion
+%   OUTPUT:
+%       emgswallow = [esid, time, envplocs(i), envpeaks(i), nextpeak]
 
 maxlag = 0.2;
 

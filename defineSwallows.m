@@ -3,7 +3,7 @@ function [pswallow,threshold] = defineSwallows(loc,tp,camdata)
 %   *: designed to be conservative (false positive is acceptable)
 %   INPUT: ylplocs (local maxima of corrected laryngeal movement)
 %          tp, loc
-%   OUTPUT: pswallow = [psid, frame, ylarypeaks(i), time]
+%   OUTPUT: pswallow = [psid, time, ylarypeaks(i)]
 
 % lary corrected trajectory = Laryngeal - jaw
 ylaryvsjaw = loc(:,11) - loc(:,14);

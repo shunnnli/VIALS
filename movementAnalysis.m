@@ -4,12 +4,12 @@ disp('----- Load loc and EMG data -----');
 sessions = ["11-062419-1"; "11-062819-1"; "12-070519-2"; "13-090919-1";...
     "14-091519-1"; "18-102119-1"; "18-102519-1"; "18-102519-2";...
     "19-111119-1"];
-session = sessions(2);
+session = sessions(9);
 disp(session);
 
 % Enter analysis window (in seconds)
 start = 0;
-stop = 9999;
+stop = 120;
 
 % Enter bandpass frequency
 % Based on Lever et al. (2009) 
@@ -20,7 +20,7 @@ bphigh = 3000;
 % Load single session data
 [camdata,loc] = loadLocData(session,start,stop,1);
 [tp,tpbout,lickbout,swallowbout] = loadLocAnalysis(session,loc,camdata,0);
-% [emg,emgenv] = loadEMG(bplow,bphigh,start,stop,camdata);
+[emg,emgenv] = loadEMG(bplow,bphigh,start,stop,camdata);
 
 % Reset tp.csv for multiple sessions
 % for i = 1:size(sessions,1)
@@ -33,12 +33,12 @@ bphigh = 3000;
 disp('----- Swallowing identification -----');
 
 % lary corrected trajectory = Laryngeal - jaw
-% ylaryvsjaw = loc(:,11) - loc(:,14);
+ylaryvsjaw = loc(:,11) - loc(:,14);
 disp('ylaryvsjaw[] generated');
 
 % Find putative swallow
 pswallow = [];
-% [pswallow,inthres] = defineSwallows(loc,tp,camdata);
+[pswallow,inthres] = defineSwallows(loc,tp,camdata);
 disp('Putative swallow found');
 
 % Further filtering of putative swallow
@@ -50,15 +50,15 @@ disp('Extended ICI found');
 
 % Validate pswallow using EMG data
 emgswallow = [];
-% emgswallow = validateSwallow(emgenv,loc,tp,camdata);
+emgswallow = validateSwallow(emgenv,loc,tp,camdata);
 disp('EMG swallow found');
 
 %% Raster plot
 disp('----- Raster plot of event summary -----');
 
 % Raster plot
-rp = plotRaster(tp,pswallow,emgswallow,camdata);
-rp_path = strcat('Videos/',session,'/','rp.fig');
+[rp,psaligned,esaligned] = plotRaster(tp,pswallow,es,camdata);
+rp_path = strcat('Videos/',session,'/','rp.svg');
 
 %% Swallowing bout visualized
 disp('----- Visualization of swallowing bout -----');
@@ -69,7 +69,8 @@ disp('----- Visualization of swallowing bout -----');
 % floor = time2frame(110,camdata);
 % ceiling = floor + 1000;
 
-floor = time2frame(95,camdata);
+% False-positive swallows: 78, 111
+floor = time2frame(75,camdata);
 ceiling = floor + 1000;
 time = frame2time(floor:ceiling,camdata);
 
@@ -94,7 +95,7 @@ hold on
 plotConditionalTraj('traj',frame2time(loc(:,1),camdata),ylaryvsjaw,tp);
 xlim([time(1) time(length(time))]);
 
-%% ylaryvsjaw + EMG
+% ylaryvsjaw + EMG
 
 % Find peaks of EMG envelope
 [envpeaks,envplocs] = findpeaks(emgenv(:,2),...
@@ -494,3 +495,9 @@ end
 "18-102519-2"
 "19-111119-1"
 %}
+
+%% Delay of skin signal
+es = emgswallow([1:7 9:32 35:36 38 41:52 54:58],:);
+estime = es(:,2);
+pstime = pswallow([1:31 33:41 43:53],2);
+delay = mean(pstime - estime);

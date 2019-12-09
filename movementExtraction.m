@@ -55,3 +55,23 @@ jawheight = 0; % 19-111119-1:23.12
 loc = construct3D(side,bottom,swallow);
 writematrix(loc,loc_path);
 disp('loc.csv saved');
+
+%% Multiple sessions
+lsessions = ["11-062419-1"; "11-062819-1"; "12-070519-2"];
+lssessions = ["13-090919-1";...
+    "14-091519-1"; "18-102119-1"; "18-102519-1"; "18-102519-2";...
+    "19-111119-1"];
+
+for i = 1:size(lsessions,1)
+    swallowdlc = 0;
+    [camdata,sideloc,bottomloc,swallowloc] = loadDLC(lsessions(i),swallowdlc);
+    
+    % Calibrate camera
+    [side,bottom,swallow] = calibrateCamera(sideloc,bottomloc,swallowloc,...
+                            noratio,laryheight,jawheight);
+
+    % construct marker position in 3D
+    loc = construct3D(side,bottom,swallow);
+    writematrix(loc,loc_path);
+    disp('loc.csv saved');
+end

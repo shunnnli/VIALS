@@ -4,7 +4,7 @@ disp('----- Load loc and EMG data -----');
 sessions = ["11-062419-1"; "11-062819-1"; "12-070519-2"; "13-090919-1";...
     "14-091519-1"; "18-102119-1"; "18-102519-1"; "18-102519-2";...
     "19-111119-1"];
-session = sessions(3);
+session = sessions(2);
 disp(session);
 
 % Enter analysis window (in seconds)
@@ -18,16 +18,16 @@ bplow = 100;
 bphigh = 3000;
 
 % Load single session data
-% [camdata,loc] = loadLocData(session,start,stop,1);
-% [tp,tpbout,lickbout,swallowbout] = loadLocAnalysis(session,loc,camdata,1);
+[camdata,loc] = loadLocData(session,start,stop,1);
+[tp,tpbout,lickbout,swallowbout] = loadLocAnalysis(session,loc,camdata,0);
 % [emg,emgenv] = loadEMG(bplow,bphigh,start,stop,camdata);
 
 % Reset tp.csv for multiple sessions
-for i = 1:size(sessions,1)
-    [camdata,loc] = loadLocData(sessions(i),start,stop,1);
-    [tp,tpbout,lickbout,swallowbout] = loadLocAnalysis(sessions(i),loc,camdata,1);
-    % [emg,emgenv] = loadEMG(bplow,bphigh,start,stop,camdata);
-end
+% for i = 1:size(sessions,1)
+%     [camdata,loc] = loadLocData(sessions(i),start,stop,1);
+%     [tp,tpbout,lickbout,swallowbout] = loadLocAnalysis(sessions(i),loc,camdata,1);
+%     % [emg,emgenv] = loadEMG(bplow,bphigh,start,stop,camdata);
+% end
 
 %% Swallowing identification
 disp('----- Swallowing identification -----');
@@ -165,7 +165,7 @@ all = ["11-062419-1"; "11-062819-1"; "12-070519-2"; "13-090919-1";...
     "19-111119-1"];
 mideline = [];
 left = [];
-animal = all(7);
+animal = all(4);
 
 % 1 -> not including phase, 2 -> including phase
 version = 2;
@@ -481,7 +481,6 @@ end
 
 %% Test
 
-analysisSingle Fix
 
 %% Session notes
 %{

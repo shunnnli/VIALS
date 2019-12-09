@@ -53,12 +53,15 @@ emgswallow = [];
 % emgswallow = validateSwallow(emgenv,loc,tp,camdata);
 disp('EMG swallow found');
 
-%% Swallowing bout visualized
-disp('----- Visualization of swallowing bout -----');
+%% Raster plot
+disp('----- Raster plot of event summary -----');
 
 % Raster plot
 rp = plotRaster(tp,pswallow,emgswallow,camdata);
 rp_path = strcat('Videos/',session,'/','rp.fig');
+
+%% Swallowing bout visualized
+disp('----- Visualization of swallowing bout -----');
 
 % Trajectory plot
 
@@ -160,7 +163,9 @@ disp('----- Tongue Trajectory PCA -----');
 all = ["11-062419-1"; "11-062819-1"; "12-070519-2"; "13-090919-1";...
     "14-091519-1"; "18-102119-1"; "18-102519-1"; "18-102519-2";...
     "19-111119-1"];
-animal = all(3);
+mideline = [];
+left = [];
+animal = all(7);
 
 % 1 -> not including phase, 2 -> including phase
 version = 2;
@@ -475,9 +480,9 @@ end
 % scatter(loc(floor:ceiling,10),loc(floor:ceiling,11));
 
 %% Test
-if isnan(tp(5,27:32))
-    disp('err');
-end
+
+analysisSingle Fix
+
 %% Session notes
 %{
 "11-062419-1"

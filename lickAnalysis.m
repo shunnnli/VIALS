@@ -4,6 +4,7 @@ initialWeight = [22.46 27.52 25.45 26.35 23.68 ...
                  14.94 19.76 20.84 24.85 19.71 ...
                  20.05 27.85 20.60];
 bin_size = 500;
+
 %% Enter new sessions
 animal_prompt = 'Enter animal id: ';
 animal = input(animal_prompt, 's');

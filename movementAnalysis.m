@@ -164,13 +164,14 @@ disp('----- Tongue Trajectory PCA -----');
 all = ["11-062419-1"; "11-062819-1"; "12-070519-2"; "13-090919-1";...
     "14-091519-1"; "18-102119-1"; "18-102519-1"; "18-102519-2";...
     "19-111119-1"];
-mideline = [];
-left = [];
+midline = ["11-062419-1";"13-090919-1";...
+    "14-091519-1"; "18-102119-1"; "18-102519-1"];
+left = ["11-062819-1"; "12-070519-2"];
 animal = all(4);
 
 % 1 -> not including phase, 2 -> including phase
 version = 2;
-[b,coeff,score,latent,tsquared,explained,mu] = trajectoryPCA(animal,version);
+[b,coeff,score,latent,tsquared,explained,mu] = trajectoryPCA(midline,version);
 b_path = strcat('Videos/',session,'/','whole.fig');
 
 %% Plot tongue trajectory

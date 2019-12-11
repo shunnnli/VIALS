@@ -4,12 +4,12 @@ disp('----- Load loc and EMG data -----');
 sessions = ["11-062419-1"; "11-062819-1"; "12-070519-2"; "13-090919-1";...
     "14-091519-1"; "18-102119-1"; "18-102519-1"; "18-102519-2";...
     "19-111119-1"];
-session = sessions(9);
+session = sessions(1);
 disp(session);
 
 % Enter analysis window (in seconds)
 start = 0;
-stop = 120;
+stop = 9999;
 
 % Enter bandpass frequency
 % Based on Lever et al. (2009) 
@@ -19,7 +19,7 @@ bphigh = 3000;
 
 % Load single session data
 [camdata,loc] = loadLocData(session,start,stop,1);
-[tp,tpbout,lickbout,swallowbout] = loadLocAnalysis(session,loc,camdata,0);
+[tp,tpbout,lickbout,swallowbout] = loadLocAnalysis(session,loc,camdata,1);
 [emg,emgenv] = loadEMG(bplow,bphigh,start,stop,camdata);
 
 % Reset tp.csv for multiple sessions
@@ -164,14 +164,23 @@ disp('----- Tongue Trajectory PCA -----');
 all = ["11-062419-1"; "11-062819-1"; "12-070519-2"; "13-090919-1";...
     "14-091519-1"; "18-102119-1"; "18-102519-1"; "18-102519-2";...
     "19-111119-1"];
-midline = ["11-062419-1";"13-090919-1"];  % total: 11688
+midline = ["11-062419-1";"13-090919-1"];  % total: 11470
 left = ["11-062819-1"; "12-070519-2"];  % total: 12847
-animal = all(1);
+animal = all(8);
 
-% 1 -> not including phase, 2 -> including phase
-version = 2;
-[b,coeff,score,latent,tsquared,explained,mu] = trajectoryPCA(midline,version);
+% v1: 'dur','pLen','ampX/Y/Z','tpDevS/B','ilmPer'
+% v2: 'dur','pLen','ampX/Y/Z','tpDevS/B','pPer/Vel','ilmPer/Vel','rPer/Vel'
+version = 1;
+[b,total,coeff,score,latent,tsquared,explained,mu] = trajectoryPCA(midline,version);
 b_path = strcat('Videos/',session,'/','whole.fig');
+
+%% PCA data analysis
+disp('------');
+tpid = 2;
+% disp(tp(tpid,:));
+tpRange = loc(tp(tpid,35):tp(tpid,36),:);
+disp(tpRange);
+
 
 %% Plot tongue trajectory
 disp('----- Plot tongue trajectory -----');
@@ -180,9 +189,9 @@ phase = 1;         % separate different lick phases or not
 disp(session);
 
 figure
-% tpid = [2333];
+tpid = 2;
 % tpid = [2162 2566 1305 2409 2157; 2823 910 2442 1943 2626] + 17; % 12-070519-2, v1
-tpid = [2841 2873 2880 2874 2856; 2568 2521 1142 2560 2601] + 17; % 12-070519-2, v2
+% tpid = [2841 2873 2880 2874 2856; 2568 2521 1142 2560 2601] + 17; % 12-070519-2, v2
 
 plotTongueTraj(phase,tpid,loc,tp,0);
 

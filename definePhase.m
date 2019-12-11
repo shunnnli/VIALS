@@ -1,4 +1,4 @@
-function [phase,tpMax] = definePhase(tpRange,mouthLocation,camdata)
+function [phase,tpMax,pEndLoc] = definePhase(tpRange,mouthLocation,camdata)
 % definePhase Identify tpMax and separate protrusion, retraction, and ILM
 %   INPUT: tpRange, mouthLocation, camdata
 %   OUTPUT: [phase,tpMax]
@@ -17,11 +17,12 @@ function [phase,tpMax] = definePhase(tpRange,mouthLocation,camdata)
 
 distance = [];
 curLoc = [];
+pEndLoc = [NaN,NaN,NaN];    % position of the tip at the end of protrusion
 phase = [];
 stop = 0;       % stop calculate retraction/ILM if can't detect protrusion
 
 for i = 1:size(tpRange,1)
-    curFrameLoc = [tpRange(i,6),tpRange(i,7),tpRange(i,8)];
+    curFrameLoc = tpRange(i,6:8);
     curLoc = [curLoc;curFrameLoc];
     d = calcDistance(mouthLocation,curFrameLoc,0);
     
@@ -34,9 +35,6 @@ for i = 1:size(tpRange,1)
     distance = [distance; d rate];
 end
 
-% if tpRange(1,1) == 355580
-%     disp(distance);
-% end
 [~,maxInd] = max(distance);
 tpMax = curLoc(maxInd(1),:);
 
@@ -50,10 +48,12 @@ if size(tpRange,1) == 2
 end
 
 for i = 2:size(distance,1)-1
+    % detect the first local minima of rate
     if distance(i-1,2) > distance(i,2) && distance(i+1,2) > distance(i,2)
         pEnd = tpRange(i,1);
         pEndRow = i;
         pPercent = pEndRow / size(distance,1);
+        pEndLoc = tpRange(i,6:8);
         % calculate avg protrusion speed
         length = 0;
         for j = 2:pEndRow
@@ -72,13 +72,13 @@ for i = 2:size(distance,1)-1
         disp(strcat('No protrusion: ',num2str(tpRange(1,1)),'-',num2str(tpRange(size(tpRange,1),1))));
         phase = [NaN NaN NaN NaN; NaN NaN NaN NaN; NaN NaN NaN NaN];
         stop = 1;
+        break
     end
 end
 
 % define retraction and ILM phase
 for i = size(distance,1)-1:-1:2
     if stop == 1
-        stop = 0;
         break
     end
     if distance(i-1,2) > distance(i,2) && distance(i+1,2) > distance(i,2)

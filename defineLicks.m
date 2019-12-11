@@ -114,25 +114,27 @@ for cur = 1:size(loc,1)
         % Calculate tongue protrusion amplitude parameters
         tpRange = loc((tongueOutFrame:tongueInFrame),:);
         amplitude = max(tpRange(:,(6:8)));
-        [phase,tpMax] = definePhase(tpRange,mouthLocation,camdata);
+        [phase,tpMax,pEndLoc] = definePhase(tpRange,mouthLocation,camdata);
         % tortuosity = calcTortuosity(tpRange,pathLen);
+%         disp('pEndLoc');
         
-        % Calculate tongue protrusion direction parameters
+        % Calculate spout location
         spoutraw = [];
-        if tongueOutFrame - 50 < 1
-            for i = 1 : tongueOutFrame+100
+        spoutwindow = 1000;
+        if tongueOutFrame - spoutwindow/2 < 1
+            for i = 1:tongueOutFrame + spoutwindow
                 if loc(i,5) >= threshold
                     spoutraw = [spoutraw;loc(i,2),loc(i,3),loc(i,4)];
                 end
             end
-        elseif tongueOutFrame + 50 > size(loc,1)
-            for i = tongueOutFrame-100 : size(loc,1)
+        elseif tongueOutFrame + spoutwindow/2 > size(loc,1)
+            for i = tongueOutFrame - spoutwindow : size(loc,1)
                 if loc(i,5) >= threshold
                     spoutraw = [spoutraw;loc(i,2),loc(i,3),loc(i,4)];
                 end
             end
         else
-            for i = tongueOutFrame-50 : tongueOutFrame+50
+            for i = tongueOutFrame-spoutwindow/2 : tongueOutFrame+spoutwindow/2
                 if loc(i,5) >= threshold
                     spoutraw = [spoutraw;loc(i,2),loc(i,3),loc(i,4)];
                 end
@@ -141,16 +143,21 @@ for cur = 1:size(loc,1)
         spout = mean(spoutraw);
         
         % mouth to spout direction vector
-        m2s = [spout(1)-mouthLocation(1),spout(2)-mouthLocation(2),...
-                        spout(3)-mouthLocation(3)];
-        % mouth to tpMax direction vector
-        m2m = [tpMax(1)-mouthLocation(1),tpMax(2)-mouthLocation(2),...
-                        tpMax(3)-mouthLocation(3)];
-%         tpDeviance = atan2d(norm(cross(m2s,m2m)),dot(m2s,m2m));
-        tpDevianceS = atan2d(norm(cross([0 m2s(2:3)],[0 m2m(2:3)])),...
-                            dot([0 m2s(2:3)],[0 m2m(2:3)]));
-        tpDevianceB = atan2d(norm(cross([m2s(1:2) 0],[m2m(1:2) 0])),...
-                            dot([m2s(1:2) 0],[m2m(1:2) 0]));
+        if ~any(isnan(pEndLoc))
+            m2s = [spout(1)-mouthLocation(1),spout(2)-mouthLocation(2),...
+                            spout(3)-mouthLocation(3)];
+            % mouth to tpMax direction vector
+            m2m = [pEndLoc(1)-mouthLocation(1),pEndLoc(2)-mouthLocation(2),...
+                            pEndLoc(3)-mouthLocation(3)];
+            % tpDeviance = atan2d(norm(cross(m2s,m2m)),dot(m2s,m2m));
+            tpDevianceS = atan2d(norm(cross([0 m2s(2:3)],[0 m2m(2:3)])),...
+                                dot([0 m2s(2:3)],[0 m2m(2:3)]));
+            tpDevianceB = atan2d(norm(cross([m2s(1:2) 0],[m2m(1:2) 0])),...
+                                dot([m2s(1:2) 0],[m2m(1:2) 0]));
+        else
+            tpDevianceS = NaN;
+            tpDevianceB = NaN;
+        end
         
         % Check if camdata.licking recorded lick events
         if ~isempty(camdata.licking)

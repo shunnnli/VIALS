@@ -3,7 +3,7 @@
 sessions = ["11-062419-1"; "11-062819-1"; "12-070519-2"; "13-090919-1";...
     "14-091519-1"; "18-102119-1"; "18-102519-1"; "18-102519-2";...
     "19-111119-1"];
-session = sessions(3);
+session = sessions(1);
 disp(session);
 
 % 0 = no swallow
@@ -57,14 +57,19 @@ writematrix(loc,loc_path);
 disp('loc.csv saved');
 
 %% Multiple sessions
-lsessions = ["11-062419-1"; "11-062819-1"; "12-070519-2"];
-lssessions = ["13-090919-1";...
+noswallow = ["11-062419-1"; "11-062819-1"; "12-070519-2"];
+swallow = ["13-090919-1";...
     "14-091519-1"; "18-102119-1"; "18-102519-1"; "18-102519-2";...
     "19-111119-1"];
 
-for i = 1:size(lsessions,1)
+for i = 1:size(noswallow,1)
     swallowdlc = 0;
-    [camdata,sideloc,bottomloc,swallowloc] = loadDLC(lsessions(i),swallowdlc);
+    [camdata,sideloc,bottomloc,swallowloc] = loadDLC(noswallow(i),swallowdlc);
+    
+    % Calibration parameters
+    noratio = [1;1;1;1];
+    laryheight = 0;
+    jawheight = 0;
     
     % Calibrate camera
     [side,bottom,swallow] = calibrateCamera(sideloc,bottomloc,swallowloc,...

@@ -19,7 +19,7 @@ bphigh = 3000;
 
 % Load single session data
 [camdata,loc] = loadLocData(session,start,stop,1);
-[tp,tpbout,lickbout,swallowbout] = loadLocAnalysis(session,loc,camdata,0);
+[tp,tpbout,lickbout,swallowbout] = loadLocAnalysis(session,loc,camdata,1);
 [emg,emgenv] = loadEMG(bplow,bphigh,start,stop,camdata);
 
 % Reset tp.csv for multiple sessions
@@ -57,7 +57,7 @@ disp('EMG swallow found');
 disp('----- Raster plot of event summary -----');
 
 % Raster plot
-[rp,psaligned,esaligned] = plotRaster(tp,pswallow,emgswallow,camdata);
+[rp,psaligned,esaligned] = plotRaster(tp,pswallow,es,camdata);
 rp_path = strcat('Videos/',session,'/','rp.svg');
 
 %% Swallowing bout visualized
@@ -69,7 +69,8 @@ disp('----- Visualization of swallowing bout -----');
 % floor = time2frame(110,camdata);
 % ceiling = floor + 1000;
 
-floor = time2frame(110,camdata);
+% False-positive swallows: 78, 111
+floor = time2frame(75,camdata);
 ceiling = floor + 1000;
 time = frame2time(floor:ceiling,camdata);
 
@@ -163,14 +164,18 @@ disp('----- Tongue Trajectory PCA -----');
 all = ["11-062419-1"; "11-062819-1"; "12-070519-2"; "13-090919-1";...
     "14-091519-1"; "18-102119-1"; "18-102519-1"; "18-102519-2";...
     "19-111119-1"];
-mideline = [];
-left = [];
-animal = all(4);
+midline = ["11-062419-1";"13-090919-1"];  % total: 11470
+left = ["11-062819-1"; "12-070519-2"];  % total: 12847
+animal = all(8);
 
-% 1 -> not including phase, 2 -> including phase
-version = 2;
-[b,coeff,score,latent,tsquared,explained,mu] = trajectoryPCA(animal,version);
+% v1: 'dur','pLen','ampX/Y/Z','tpDevS/B','ilmPer'
+% v2: 'dur','pLen','ampX/Y/Z','tpDevS/B','pPer/Vel','ilmPer/Vel','rPer/Vel'
+version = 1;
+[b,total,coeff,score,latent,tsquared,explained,mu] = trajectoryPCA(midline,version);
 b_path = strcat('Videos/',session,'/','whole.fig');
+
+%% PCA data analysis
+disp(tp(1,:));
 
 %% Plot tongue trajectory
 disp('----- Plot tongue trajectory -----');
@@ -179,9 +184,9 @@ phase = 1;         % separate different lick phases or not
 disp(session);
 
 figure
-% tpid = [2333];
+tpid = [1];
 % tpid = [2162 2566 1305 2409 2157; 2823 910 2442 1943 2626] + 17; % 12-070519-2, v1
-tpid = [2841 2873 2880 2874 2856; 2568 2521 1142 2560 2601] + 17; % 12-070519-2, v2
+% tpid = [2841 2873 2880 2874 2856; 2568 2521 1142 2560 2601] + 17; % 12-070519-2, v2
 
 plotTongueTraj(phase,tpid,loc,tp,0);
 
@@ -497,6 +502,6 @@ end
 
 %% Delay of skin signal
 es = emgswallow([1:7 9:32 35:36 38 41:52 54:58],:);
-estime = estime(:,2);
+estime = es(:,2);
 pstime = pswallow([1:31 33:41 43:53],2);
 delay = mean(pstime - estime);

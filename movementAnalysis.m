@@ -166,12 +166,12 @@ all = ["11-062419-1"; "11-062819-1"; "12-070519-2"; "13-090919-1";...
     "19-111119-1"];
 midline = ["11-062419-1";"13-090919-1"];  % total: 11470
 left = ["11-062819-1"; "12-070519-2"];  % total: 12847
-animal = all(8);
+animal = all(1);
 
 % v1: 'dur','pLen','ampX/Y/Z','tpDevS/B','ilmPer'
 % v2: 'dur','pLen','ampX/Y/Z','tpDevS/B','pPer/Vel','ilmPer/Vel','rPer/Vel'
-version = 1;
-[b,total,coeff,score,latent,tsquared,explained,mu] = trajectoryPCA(midline,version);
+version = 2;
+[b,total,coeff,score,latent,tsquared,explained,mu] = trajectoryPCA(animal,version);
 b_path = strcat('Videos/',session,'/','whole.fig');
 
 %% PCA data analysis
@@ -189,7 +189,7 @@ phase = 1;         % separate different lick phases or not
 disp(session);
 
 figure
-tpid = 2;
+tpid = 1;
 % tpid = [2162 2566 1305 2409 2157; 2823 910 2442 1943 2626] + 17; % 12-070519-2, v1
 % tpid = [2841 2873 2880 2874 2856; 2568 2521 1142 2560 2601] + 17; % 12-070519-2, v2
 

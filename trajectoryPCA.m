@@ -25,13 +25,14 @@ end
 total(any(isnan(total(:,6:7)),2),:) = [];
 disp(strcat('Total tongue protrusion analyzed:', num2str(size(total,1))));
 
+b = figure;
 if version == 1
-    [coeff,score,latent,tsquared,explained,mu] = pca(total,'VariableWeights','variance');
-    b = biplot(coeff(:,1:2),'scores',score(:,1:2), 'varlabels',...
+    [coeff,score,latent,tsquared,explained,mu] = pca(zscore(total),'VariableWeights','variance');
+    biplot(coeff(:,1:2),'scores',score(:,1:2), 'varlabels',...
         {'dur','pLen','ampX','ampY','ampZ','tpDevS','tpDevB','ilmPer'});
 else
-    [coeff,score,latent,tsquared,explained,mu] = pca(total,'VariableWeights','variance');
-    b = biplot(coeff(:,1:2),'scores',score(:,1:2), ...
+    [coeff,score,latent,tsquared,explained,mu] = pca(zscore(total),'VariableWeights','variance');
+    biplot(coeff(:,1:2),'scores',score(:,1:2), ...
     'varlabels',{'dur','pLen','ampX','ampY','ampZ','tpDevS','tpDevB',...
     'pPer','pVel','ilmPer','ilmVel','rPer','rVel'});
 end
@@ -47,7 +48,9 @@ b = biplot(coeff(:,1:2),'scores',score(:,1:2), ...
 % Related materials
 %{
 1. https://courses.engr.illinois.edu/bioe298b/sp2018/Lecture%20Examples/23%20PCA%20slides.pdf
-
+2. https://www.researchgate.net/post/What_is_the_best_way_to_scale_parameters_before_running_a_Principal_Component_Analysis_PCA
+3. https://stats.stackexchange.com/questions/53/pca-on-correlation-or-covariance
+4. https://www.mathworks.com/help/stats/pca.html
 %}
 
 end

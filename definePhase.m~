@@ -97,11 +97,7 @@ for i = size(distance,1)-1:-1:2
         
         ilmStart = pEndRow + 1;
         ilmEnd = rStartRow - 1;
-        if ilmStart == ilmEnd
-            ilmPercent = 0;
-        else
-            ilmPercent = 1 - rPercent - phase(1,3);
-        end
+        ilmPercent = 1 - rPercent - phase(1,3);
         % calculate avg ilm speed
         length = 0;
         for j = ilmStart+1:ilmEnd
@@ -110,10 +106,11 @@ for i = size(distance,1)-1:-1:2
             length = length + calcDistance(prev,cur,0);
         end
         time = camdata.times(tpRange(ilmEnd,1),2) - camdata.times(tpRange(ilmStart,1),2);
-        if time == 0
-            ilmSpeed = 0;
-        else
-            ilmSpeed = length/time;
+        ilmSpeed = length/time;
+        if isnan(ilmSpeed)
+            disp('---');
+            disp(length);
+            disp(ti)
         end
         
         phase = [phase; tpRange(ilmStart,1),tpRange(ilmEnd,1),ilmPercent ilmSpeed;...

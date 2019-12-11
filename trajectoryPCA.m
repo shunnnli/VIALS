@@ -26,11 +26,11 @@ total(any(isnan(total(:,6:7)),2),:) = [];
 disp(strcat('Total tongue protrusion analyzed:', num2str(size(total,1))));
 
 if version == 1
-    [coeff,score,latent,tsquared,explained,mu] = pca(zscore(total));
+    [coeff,score,latent,tsquared,explained,mu] = pca(total,'VariableWeights','variance');
     b = biplot(coeff(:,1:2),'scores',score(:,1:2), 'varlabels',...
         {'dur','pLen','ampX','ampY','ampZ','tpDevS','tpDevB','ilmPer'});
 else
-    [coeff,score,latent,tsquared,explained,mu] = pca(zscore(total));
+    [coeff,score,latent,tsquared,explained,mu] = pca(total,'VariableWeights','variance');
     b = biplot(coeff(:,1:2),'scores',score(:,1:2), ...
     'varlabels',{'dur','pLen','ampX','ampY','ampZ','tpDevS','tpDevB',...
     'pPer','pVel','ilmPer','ilmVel','rPer','rVel'});

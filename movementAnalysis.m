@@ -164,7 +164,7 @@ disp('----- Tongue Trajectory PCA -----');
 all = ["11-062419-1"; "11-062819-1"; "12-070519-2"; "13-090919-1";...
     "14-091519-1"; "18-102119-1"; "18-102519-1"; "18-102519-2";...
     "19-111119-1"];
-midline = ["11-062419-1";"13-090919-1"];  % total: 11500
+mid = ["11-062419-1";"13-090919-1"];  % total: 11500
 left = ["11-062819-1"; "12-070519-2"];  % total: 12576
 animal = all(4);
 
@@ -172,7 +172,7 @@ animal = all(4);
 % v2: 'dur','pLen','ampX/Y/Z','tpDevS/B','pPer/Vel','ilmPer/Vel','rPer/Vel'
 version = 2;
 dimension = 2;
-[b,total,pcadata,kmdata] = tpPCA(left,version,dimension);
+[b,total,pcadata,kmdata] = tpPCA(mid,version,dimension);
 
 figure
 bar(1:size(pcadata.explained,1),pcadata.explained);

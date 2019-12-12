@@ -48,7 +48,7 @@ for i = 1:size(explained,1)
         break
     end
 end
-disp(strcat(num2str(majorPC),'PCs were required to explain >90% of total variance.'));
+disp(strcat(num2str(majorPC),' PCs were required to explain >90% of total variance.'));
 
 % Find optimal number of k-means clusters
 tpPC = score(:,1:2);

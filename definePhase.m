@@ -1,6 +1,6 @@
-function [phase,tpMax,pEndLoc] = definePhase(tpRange,mouthLocation,camdata)
+function [phase,tpMax,pEndLoc] = definePhase(tpRange,mouthLocation)
 % definePhase Identify tpMax and separate protrusion, retraction, and ILM
-%   INPUT: tpRange, mouthLocation, camdata
+%   INPUT: tpRange, mouthLocation
 %   OUTPUT: [phase,tpMax]
 %       phase: [pStart, pEnd, pPercent, pSpeed; 
 %               ilmStart, ilmEnd, ilmPercent, ilmSpeed;
@@ -29,8 +29,8 @@ for i = 1:size(tpRange,1)
     if i == 1
         rate = d;
     else
-        interval = camdata.times(tpRange(i,1),2) - camdata.times(tpRange(i-1,1),2);
-        rate = (abs(d-distance(i-1))) / interval;
+        rate = (abs(d-distance(i-1))) / 0.006;
+        % ratesigned = (d-distance(i-1)) / 0.006;
     end
     distance = [distance; d rate];
 end
@@ -45,9 +45,14 @@ pEndRow = 0;
 if size(tpRange,1) == 2
     disp(strcat('tpRange only has two frames: ',num2str(tpRange(1,1)),'-',num2str(tpRange(size(tpRange,1),1))));
     phase = [NaN NaN NaN NaN; NaN NaN NaN NaN; NaN NaN NaN NaN];
+    stop = 1;
 end
 
 for i = 2:size(distance,1)-1
+    if stop == 1
+        break
+    end
+    
     % detect the first local minima of rate
     if distance(i-1,2) > distance(i,2) && distance(i+1,2) > distance(i,2)
         pEnd = tpRange(i,1);
@@ -61,7 +66,7 @@ for i = 2:size(distance,1)-1
             cur = tpRange(j,(6:8));
             length = length + calcDistance(prev,cur,0);
         end
-        time = camdata.times(tpRange(pEndRow,1),2) - camdata.times(tpRange(1,1),2);
+        time = 0.006 * (tpRange(pEndRow,1) - tpRange(1,1));
         pSpeed = length/time;
         phase = [tpRange(1,1) pEnd pPercent pSpeed];
         break
@@ -81,6 +86,7 @@ for i = size(distance,1)-1:-1:2
     if stop == 1
         break
     end
+    
     if distance(i-1,2) > distance(i,2) && distance(i+1,2) > distance(i,2)
         rStart = tpRange(i,1);
         rStartRow = i;
@@ -92,7 +98,7 @@ for i = size(distance,1)-1:-1:2
             cur = tpRange(j,(6:8));
             length = length + calcDistance(prev,cur,0);
         end
-        time = camdata.times(tpRange(size(tpRange,1),1),2) - camdata.times(tpRange(rStartRow,1),2);
+        time = 0.006 * (tpRange(size(tpRange,1),1) - tpRange(rStartRow,1));
         rSpeed = length/time;
         
         ilmStart = pEndRow + 1;
@@ -109,7 +115,7 @@ for i = size(distance,1)-1:-1:2
             cur = tpRange(j,(6:8));
             length = length + calcDistance(prev,cur,0);
         end
-        time = camdata.times(tpRange(ilmEnd,1),2) - camdata.times(tpRange(ilmStart,1),2);
+        time = 0.006 * (tpRange(ilmEnd,1) - tpRange(ilmStart,1));
         if time == 0
             ilmSpeed = 0;
         else

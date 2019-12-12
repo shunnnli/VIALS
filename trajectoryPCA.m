@@ -1,7 +1,9 @@
-function [b,total,coeff,score,latent,tsquared,explained,mu] = trajectoryPCA(sessions,version)
-%UNTITLED7 Summary of this function goes here
-%   Detailed explanation goes here
-% 1 -> not including phase, 2 -> including phase
+function [b,total,coeff,score,latent,tsquared,explained,mu] = trajectoryPCA(sessions,version,dimension)
+% trajectoryPCA: return and plot results of PCA analysis
+%   INPUT:
+%       sessions: list of sessions to be analyzed
+%       version: PCA variable set
+%       dimension: dimension of the biplot
 
 % Combine tp.csv from session
 % pathLen, tpDevS/B, tpMax, ilmPercent
@@ -28,11 +30,11 @@ disp(strcat('Total tongue protrusion analyzed:', num2str(size(total,1))));
 b = figure;
 if version == 1
     [coeff,score,latent,tsquared,explained,mu] = pca(zscore(total),'VariableWeights','variance');
-    biplot(coeff(:,1:2),'scores',score(:,1:2), 'varlabels',...
+    biplot(coeff(:,1:dimension),'scores',score(:,1:dimension), 'varlabels',...
         {'dur','pLen','ampX','ampY','ampZ','tpDevS','tpDevB','ilmPer'});
 else
     [coeff,score,latent,tsquared,explained,mu] = pca(zscore(total),'VariableWeights','variance');
-    biplot(coeff(:,1:2),'scores',score(:,1:2), ...
+    biplot(coeff(:,1:dimension),'scores',score(:,1:dimension), ...
     'varlabels',{'dur','pLen','ampX','ampY','ampZ','tpDevS','tpDevB',...
     'pPer','pVel','ilmPer','ilmVel','rPer','rVel'});
 end

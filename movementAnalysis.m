@@ -4,7 +4,7 @@ disp('----- Load loc and EMG data -----');
 sessions = ["11-062419-1"; "11-062819-1"; "12-070519-2"; "13-090919-1";...
     "14-091519-1"; "18-102119-1"; "18-102519-1"; "18-102519-2";...
     "19-111119-1"];
-session = sessions(1);
+session = sessions(3);
 disp(session);
 
 % Enter analysis window (in seconds)
@@ -164,14 +164,15 @@ disp('----- Tongue Trajectory PCA -----');
 all = ["11-062419-1"; "11-062819-1"; "12-070519-2"; "13-090919-1";...
     "14-091519-1"; "18-102119-1"; "18-102519-1"; "18-102519-2";...
     "19-111119-1"];
-midline = ["11-062419-1";"13-090919-1"];  % total: 11470
-left = ["11-062819-1"; "12-070519-2"];  % total: 12847
+midline = ["11-062419-1";"13-090919-1"];  % total: 11500
+left = ["11-062819-1"; "12-070519-2"];  % total: 12576
 animal = all(1);
 
 % v1: 'dur','pLen','ampX/Y/Z','tpDevS/B','ilmPer'
 % v2: 'dur','pLen','ampX/Y/Z','tpDevS/B','pPer/Vel','ilmPer/Vel','rPer/Vel'
 version = 2;
-[b,total,coeff,score,latent,tsquared,explained,mu] = trajectoryPCA(animal,version);
+dimension = 3;
+[b,total,coeff,score,latent,tsquared,explained,mu] = trajectoryPCA(midline,version,dimension);
 b_path = strcat('Videos/',session,'/','whole.fig');
 
 %% PCA data analysis
@@ -490,7 +491,9 @@ end
 % scatter(loc(floor:ceiling,10),loc(floor:ceiling,11));
 
 %% Test
+A = [1,1,1;2,2,3;3,3,3];
 
+B = find(A(:,3)<0,1);
 
 %% Session notes
 %{

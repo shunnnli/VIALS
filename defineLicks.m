@@ -114,7 +114,7 @@ for cur = 1:size(loc,1)
         % Calculate tongue protrusion amplitude parameters
         tpRange = loc((tongueOutFrame:tongueInFrame),:);
         amplitude = max(tpRange(:,(6:8)));
-        [phase,tpMax,pEndLoc] = definePhase(tpRange,mouthLocation,camdata);
+        [phase,tpMax,pEndLoc] = definePhase(tpRange,mouthLocation);
         % tortuosity = calcTortuosity(tpRange,pathLen);
 %         disp('pEndLoc');
         

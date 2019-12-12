@@ -60,7 +60,7 @@ eva = evalclusters(tpPC,clust,'CalinskiHarabasz');
 disp(eva);
 
 % Perform k-means clustering
-[cluster,centroid] = kmeans(tpPC,eva.OptimalK);
+[cluster,centroid,~,d] = kmeans(tpPC,eva.OptimalK);
 
 % Plot k-means clusters
 figure
@@ -84,6 +84,7 @@ kmdata.majorPC = majorPC;
 kmdata.eva = eva;
 kmdata.cluster = cluster;
 kmdata.centroid = centroid;
+kmdata.d = d;
 
 % Full labels
 %{

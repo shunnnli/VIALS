@@ -33,31 +33,31 @@ bphigh = 3000;
 disp('----- Swallowing identification -----');
 
 % lary corrected trajectory = Laryngeal - jaw
-ylaryvsjaw = loc(:,11) - loc(:,14);
-disp('ylaryvsjaw[] generated');
+% ylaryvsjaw = loc(:,11) - loc(:,14);
+% disp('ylaryvsjaw[] generated');
 
 % Find putative swallow
 pswallow = [];
-[pswallow,inthres] = defineSwallows(loc,tp,camdata);
-disp('Putative swallow found');
+% [pswallow,inthres] = defineSwallows(loc,tp,camdata);
+% disp('Putative swallow found');
 
 % Further filtering of putative swallow
 % 2. if laryngeal does not move
 
 % Find extended ILIs (longer than 20ms)
-longici = findExtendedICI(tp,0.02);
-disp('Extended ICI found');
+% longici = findExtendedICI(tp,0.02);
+% disp('Extended ICI found');
 
 % Validate pswallow using EMG data
 emgswallow = [];
-emgswallow = validateSwallow(emgenv,loc,tp,camdata);
-disp('EMG swallow found');
+% emgswallow = validateSwallow(emgenv,loc,tp,camdata);
+% disp('EMG swallow found');
 
 %% Raster plot
 disp('----- Raster plot of event summary -----');
 
 % Raster plot
-[rp,psaligned,esaligned] = plotRaster(tp,pswallow,es,camdata);
+[rp,psaligned,esaligned] = plotRaster(tp,pswallow,emgswallow,camdata);
 rp_path = strcat('Videos/',session,'/','rp.svg');
 
 %% Swallowing bout visualized
@@ -182,11 +182,11 @@ ylabel('Percentage of total variance explained');
 
 %% PCA data analysis
 disp('------');
-tpid = 2;
-% disp(tp(tpid,:));
-tpRange = loc(tp(tpid,35):tp(tpid,36),:);
-disp(tpRange);
 
+[~,first] = min(kmdata.d(:,1));
+[~,second] = min(kmdata.d(:,2));
+[~,third] = min(kmdata.d(:,3));
+[~,fourth] = min(kmdata.d(:,4));
 
 %% Plot tongue trajectory
 disp('----- Plot tongue trajectory -----');

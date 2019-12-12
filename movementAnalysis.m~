@@ -4,7 +4,7 @@ disp('----- Load loc and EMG data -----');
 sessions = ["11-062419-1"; "11-062819-1"; "12-070519-2"; "13-090919-1";...
     "14-091519-1"; "18-102119-1"; "18-102519-1"; "18-102519-2";...
     "19-111119-1"];
-session = sessions(3);
+session = sessions(5);
 disp(session);
 
 % Enter analysis window (in seconds)
@@ -33,31 +33,31 @@ bphigh = 3000;
 disp('----- Swallowing identification -----');
 
 % lary corrected trajectory = Laryngeal - jaw
-ylaryvsjaw = loc(:,11) - loc(:,14);
-disp('ylaryvsjaw[] generated');
+% ylaryvsjaw = loc(:,11) - loc(:,14);
+% disp('ylaryvsjaw[] generated');
 
 % Find putative swallow
 pswallow = [];
-[pswallow,inthres] = defineSwallows(loc,tp,camdata);
-disp('Putative swallow found');
+% [pswallow,inthres] = defineSwallows(loc,tp,camdata);
+% disp('Putative swallow found');
 
 % Further filtering of putative swallow
 % 2. if laryngeal does not move
 
 % Find extended ILIs (longer than 20ms)
-longici = findExtendedICI(tp,0.02);
-disp('Extended ICI found');
+% longici = findExtendedICI(tp,0.02);
+% disp('Extended ICI found');
 
 % Validate pswallow using EMG data
 emgswallow = [];
-emgswallow = validateSwallow(emgenv,loc,tp,camdata);
-disp('EMG swallow found');
+% emgswallow = validateSwallow(emgenv,loc,tp,camdata);
+% disp('EMG swallow found');
 
 %% Raster plot
 disp('----- Raster plot of event summary -----');
 
 % Raster plot
-[rp,psaligned,esaligned] = plotRaster(tp,pswallow,es,camdata);
+[rp,psaligned,esaligned] = plotRaster(tp,pswallow,emgswallow,camdata);
 rp_path = strcat('Videos/',session,'/','rp.svg');
 
 %% Swallowing bout visualized
@@ -160,11 +160,12 @@ plot(percentage(:,1),percentage(:,2));
 
 %% Tongue trajectory PCA
 disp('----- Tongue Trajectory PCA -----');
+% path = 
 
 all = ["11-062419-1"; "11-062819-1"; "12-070519-2"; "13-090919-1";...
     "14-091519-1"; "18-102119-1"; "18-102519-1"; "18-102519-2";...
     "19-111119-1"];
-midline = ["11-062419-1";"13-090919-1"];  % total: 11500
+mid = ["11-062419-1";"14-091519-1"];  % total: 14856
 left = ["11-062819-1"; "12-070519-2"];  % total: 12576
 animal = all(4);
 
@@ -172,21 +173,18 @@ animal = all(4);
 % v2: 'dur','pLen','ampX/Y/Z','tpDevS/B','pPer/Vel','ilmPer/Vel','rPer/Vel'
 version = 2;
 dimension = 2;
-[b,total,pcadata,kmdata] = tpPCA(midline,version,dimension);
+[b,total,pcadata,kmdata] = tpPCA(mid,version,dimension);
 
-% figure
-% bar(1:size(pcadata.explained,1), pcadata.explained);
-% xlabel('Principle component');
-% ylabel('Percentage of total variance explained');
-
-b_path = strcat('Videos/',session,'/','whole.fig');
+figure
+bar(1:size(pcadata.explained,1),pcadata.explained);
+xlabel('Principle component');
+ylabel('Percentage of total variance explained');
 
 %% PCA data analysis
 disp('------');
-tpid = 2;
-% disp(tp(tpid,:));
-tpRange = loc(tp(tpid,35):tp(tpid,36),:);
-disp(tpRange);
+
+% cyan
+find(pcadata.score(:,1) == -1.1451,pcadata.score);
 
 
 %% Plot tongue trajectory

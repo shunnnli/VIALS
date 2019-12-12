@@ -4,6 +4,9 @@ function [b,total,pcadata,kmdata] = tpPCA(sessions,version,dim)
 %       sessions: list of sessions to be analyzed
 %       version: PCA variable set
 %       dimension: dimension of the biplot
+%   OUTPUT:
+%       total = [sid tpid dur pLen ampX/Y/Z tpDevS/B ilmPer]
+%       total = [sid tpid dur pLen ampX/Y/Z tpDevS/B pPer/Vel ilmPer/Vel rPer/Vel]
 
 % Combine tp.csv from session
 total = [];
@@ -11,31 +14,35 @@ for i = 1:size(sessions,1)
     tp_path = strcat('Videos/',sessions(i),'/tp.csv');
     if isfile(tp_path)
         tp = readmatrix(tp_path);
+        disp(strcat('Session: ', sessions(i)));
+        sid(1:size(tp,1),1) = i;
+        disp(size(sid,1));
         if version == 1
-            total = [total; tp(:,[5 6:11 17])];
+            total = [total; sid tp(:,[1 5 6:11 17])];
         else
-            total = [total; tp(:,[5 6:11 15:20])];
+            total = [total; sid tp(:,[1 5 6:11 15:20])];
         end
     else
         disp('tp.csv does not exist!');
         disp(strcat('Session: ', sessions(i)));
     end
+    sid = 0;
 end
 
 % removes tp that tpDevS/B is NaN
-total(any(isnan(total(:,6:7)),2),:) = [];
+total(any(isnan(total(:,8:9)),2),:) = [];
 disp(strcat('Total tongue protrusion analyzed:', num2str(size(total,1))));
 
 % Perform PCA analysis
 if version == 1
-    [coeff,score,latent,tsquared,explained,mu] = pca(zscore(total),'VariableWeights','variance');
+    [coeff,score,latent,tsquared,explained,mu] = pca(zscore(total(:,3:10)),'VariableWeights','variance');
     varlabels = {'dur','pLen','ampX','ampY','ampZ','tpDevS','tpDevB','ilmPer'};
-    b = biplot(coeff(:,1:dim),'scores',score(:,1:dim),'varlabels',varlabels);
+    b = biplot(coeff(:,1:dim),'scores',score(:,1:dim),'Varlabels',varlabels);
 else
-    [coeff,score,latent,tsquared,explained,mu] = pca(zscore(total),'VariableWeights','variance');
+    [coeff,score,latent,tsquared,explained,mu] = pca(zscore(total(:,3:15)),'VariableWeights','variance');
     varlabels = {'dur','pLen','ampX','ampY','ampZ','tpDevS','tpDevB',...
     'pPer','pVel','ilmPer','ilmVel','rPer','rVel'};
-    b = biplot(coeff(:,1:dim),'scores',score(:,1:dim),'varlabels',varlabels);
+    b = biplot(coeff(:,1:dim),'scores',score(:,1:dim),'Varlabels',varlabels);
 end
 
 % Find the number of PC needed to explain >90% of variance

@@ -1,4 +1,4 @@
-function [] = plotTongueTraj(phase,tpid,loc,tp,plane)
+function [] = plotTongueTraj(phase,tpid,session,plane)
 % plotTongueTraj: plot tongue trajectory given tpid
 %   INPUT: 
 %       phase: 1 -> separate protrusion, retraction, ILM
@@ -11,6 +11,9 @@ function [] = plotTongueTraj(phase,tpid,loc,tp,plane)
 %           --> licks from smaller PCA clusters (licks w/o ILM and licks w/ little angle)
 %           the second row: green -> blue -> purple
 %           --> licks from larger PCA clusters
+
+[camdata,loc] = loadLocData(session,0,9999,1);
+[tp,~,~,~] = loadLocAnalysis(session,loc,camdata,0);
 
 for i = 1:size(tpid,1)
     for j = 1:size(tpid,2)
@@ -237,7 +240,10 @@ end
 
 grid on
 axis equal
-% legend
+xlabel('ML')
+ylabel('AP')
+zlabel('DV')
+% legend('location','ne')
 
 end
 

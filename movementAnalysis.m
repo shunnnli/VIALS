@@ -4,7 +4,7 @@ disp('----- Load loc and EMG data -----');
 sessions = ["11-062419-1"; "11-062819-1"; "12-070519-2"; "13-090919-1";...
     "14-091519-1"; "18-102119-1"; "18-102519-1"; "18-102519-2";...
     "19-111119-1"];
-session = sessions(5);
+session = sessions(2);
 disp(session);
 
 % Enter analysis window (in seconds)
@@ -19,8 +19,8 @@ bphigh = 3000;
 
 % Load single session data
 [camdata,loc] = loadLocData(session,start,stop,1);
-[tp,tpbout,lickbout,swallowbout] = loadLocAnalysis(session,loc,camdata,1);
-[emg,emgenv] = loadEMG(bplow,bphigh,start,stop,camdata);
+[tp,tpbout,lickbout,swallowbout] = loadLocAnalysis(session,loc,camdata,0);
+% [emg,emgenv] = loadEMG(bplow,bphigh,start,stop,camdata);
 
 % Reset tp.csv for multiple sessions
 % for i = 1:size(sessions,1)
@@ -70,7 +70,7 @@ disp('----- Visualization of swallowing bout -----');
 % ceiling = floor + 1000;
 
 % False-positive swallows: 78, 111
-floor = time2frame(75,camdata);
+floor = time2frame(15,camdata);
 ceiling = floor + 1000;
 time = frame2time(floor:ceiling,camdata);
 
@@ -165,9 +165,9 @@ disp('----- Tongue Trajectory PCA -----');
 all = ["11-062419-1"; "11-062819-1"; "12-070519-2"; "13-090919-1";...
     "14-091519-1"; "18-102119-1"; "18-102519-1"; "18-102519-2";...
     "19-111119-1"];
-mid = ["11-062419-1";"14-091519-1"];  % total: 14856
-left = ["11-062819-1"; "12-070519-2"];  % total: 12576
-animal = all(4);
+mid = ["11-062419-1";"14-091519-1"];  % total: 14856 (8186+)
+left = ["11-062819-1"; "12-070519-2"];  % total: 12576 (9074+)
+animal = all(2);
 
 % v1: 'dur','pLen','ampX/Y/Z','tpDevS/B','ilmPer'
 % v2: 'dur','pLen','ampX/Y/Z','tpDevS/B','pPer/Vel','ilmPer/Vel','rPer/Vel'
@@ -175,31 +175,58 @@ version = 2;
 dimension = 2;
 [b,total,pcadata,kmdata] = tpPCA(mid,version,dimension);
 
-figure
-bar(1:size(pcadata.explained,1),pcadata.explained);
-xlabel('Principle component');
-ylabel('Percentage of total variance explained');
+% figure
+% bar(1:size(pcadata.explained,1),pcadata.explained);
+% xlabel('Principle component');
+% ylabel('Percentage of total variance explained');
 
 %% PCA data analysis
 disp('------');
 
-[~,first] = min(kmdata.d(:,1));
-[~,second] = min(kmdata.d(:,2));
-[~,third] = min(kmdata.d(:,3));
-[~,fourth] = min(kmdata.d(:,4));
+% retrieve observations closest to the centroid
+[~,sw] = min(kmdata.d(:,1));
+[~,se] = min(kmdata.d(:,2));
+[~,nw] = min(kmdata.d(:,3));
+[~,ne] = min(kmdata.d(:,4));
+
+% Centroid samples
+%{
+SW: mid: 1-1972 left: 2-2055
+SE: mid: 1-5040 left: 1-4501
+NW: mid: 2-1850 left: 1-4038
+NE: mid: 2-4958 left: 2-1831
+%}
+
+% sessions
+all = ["11-062419-1"; "11-062819-1"; "12-070519-2"; "13-090919-1";...
+    "14-091519-1"; "18-102119-1"; "18-102519-1"; "18-102519-2";...
+    "19-111119-1"];
+mid = ["11-062419-1";"14-091519-1"];  % total: 14856 (8186+)
+left = ["11-062819-1"; "12-070519-2"];  % total: 12576 (9074+)
+tp_path = strcat('Videos/',left(2),'/tp.csv');
+tp = readmatrix(tp_path);
+
+% form a tp table
+% ctp = [];
+ctp = [ctp; tp(total(ne,2),:)];
 
 %% Plot tongue trajectory
 disp('----- Plot tongue trajectory -----');
 
 phase = 1;         % separate different lick phases or not
+
+mid = ["11-062419-1";"14-091519-1"];  % total: 14856 (8186+)
+left = ["11-062819-1";"12-070519-2"];  % total: 12576 (9074+)
+session = left(1);
 disp(session);
 
-figure
-tpid = 1;
+ctpid = transpose(ctp(:,1));
+tpid = ctpid(3);
 % tpid = [2162 2566 1305 2409 2157; 2823 910 2442 1943 2626] + 17; % 12-070519-2, v1
 % tpid = [2841 2873 2880 2874 2856; 2568 2521 1142 2560 2601] + 17; % 12-070519-2, v2
 
-plotTongueTraj(phase,tpid,loc,tp,0);
+% figure
+plotTongueTraj(phase,tpid,session,0);
 
 %% Swallowing marker trajectories
 % --------------------- Laryngeal complex trajectory ---------------------
@@ -496,9 +523,9 @@ end
 % scatter(loc(floor:ceiling,10),loc(floor:ceiling,11));
 
 %% Test
-A = [1,1,1;2,2,3;3,3,3];
-
-B = find(A(:,3)<0,1);
+total2 = [];
+sid(1:size(tp,1),1) = 2;
+total = [total1; sid tp(:,[1 5 6:11 15:20])];
 
 %% Session notes
 %{

@@ -174,12 +174,10 @@ version = 2;
 dimension = 2;
 [b,total,pcadata,kmdata] = tpPCA(left,version,dimension);
 
-% figure
-% bar(1:size(pcadata.explained,1),pcadata.explained);
-% xlabel('Principle component');
-% ylabel('Percentage of total variance explained');
-
-b_path = strcat('Videos/',session,'/','whole.fig');
+figure
+bar(1:size(pcadata.explained,1),pcadata.explained);
+xlabel('Principle component');
+ylabel('Percentage of total variance explained');
 
 %% PCA data analysis
 disp('------');

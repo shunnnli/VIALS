@@ -1,4 +1,4 @@
-function [b,total,coeff,score,latent,tsquared,explained,mu] = trajectoryPCA(sessions,version,dimension)
+function [b,total,pcadata] = trajectoryPCA(sessions,version,dimension)
 % trajectoryPCA: return and plot results of PCA analysis
 %   INPUT:
 %       sessions: list of sessions to be analyzed
@@ -27,6 +27,7 @@ end
 total(any(isnan(total(:,6:7)),2),:) = [];
 disp(strcat('Total tongue protrusion analyzed:', num2str(size(total,1))));
 
+% Perform PCA analysis 
 b = figure;
 if version == 1
     [coeff,score,latent,tsquared,explained,mu] = pca(zscore(total),'VariableWeights','variance');
@@ -38,6 +39,14 @@ else
     'varlabels',{'dur','pLen','ampX','ampY','ampZ','tpDevS','tpDevB',...
     'pPer','pVel','ilmPer','ilmVel','rPer','rVel'});
 end
+
+% Store PCA data in a struct array
+pcadata.coeff = coeff;
+pcadata.score = score;
+pcadata.latent = latent;
+pcadata.tsquared = tsquared;
+pcadata.explained = explained;
+pcadata.mu = mu;
 
 % Full labels
 %{

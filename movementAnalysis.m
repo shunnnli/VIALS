@@ -172,7 +172,13 @@ animal = all(1);
 % v2: 'dur','pLen','ampX/Y/Z','tpDevS/B','pPer/Vel','ilmPer/Vel','rPer/Vel'
 version = 2;
 dimension = 3;
-[b,total,coeff,score,latent,tsquared,explained,mu] = trajectoryPCA(midline,version,dimension);
+[b,total,pcadata] = trajectoryPCA(midline,version,dimension);
+
+figure
+bar(1:size(pcadata.explained,1), pcadata.explained);
+xlabel('Principle component');
+ylabel('Percentage of total variance explained');
+
 b_path = strcat('Videos/',session,'/','whole.fig');
 
 %% PCA data analysis

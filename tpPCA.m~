@@ -48,7 +48,7 @@ for i = 1:size(explained,1)
         break
     end
 end
-disp(strcat(num2str(majorPC),'PCs were required to explain >90% of total variance.'));
+disp(strcat(num2str(majorPC),'were');
 
 % Find optimal number of k-means clusters
 tpPC = score(:,1:2);
@@ -103,7 +103,6 @@ PCA materials:
 
 K-means materials:
 1. https://www.mathworks.com/products/demos/machine-learning/cluster-genes.html
-2. https://medium.com/@dmitriy.kavyazin/principal-component-analysis-and-k-means-clustering-to-visualize-a-high-dimensional-dataset-577b2a7a5fe2
 %}
 
 end

@@ -1,6 +1,4 @@
 function [camdata,loc] = loadLocData(session,start,stop,rmoutliersON)
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
 
 camdata = load(strcat('Videos/',session,'/times.mat'));
 
@@ -26,7 +24,7 @@ if rmoutliersON == 1
         for i = [10 11 13 14]
             % Skip if the column is all NaN (18-102119-1)
             if ~isnan(loc(:,i))
-                loc = removeOutliers(loc,i);
+                [loc,~] = removeOutliers(loc,i);
             end
         end
     end

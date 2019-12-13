@@ -22,14 +22,17 @@ for i = 1:size(dlarydx,1)
         if bouton == 1
             boutend = size(dlarydx,1);
             % Get resting marker location
+            %{
             low = bout(size(bout,1)-1,2);
             high = boutend;
             restlaryx = mean(loc(low:high,10),'omitnan');
             restlaryy = mean(loc(low:high,11),'omitnan');
             restjawx = mean(loc(low:high,13),'omitnan');
             restjawy = mean(loc(low:high,14),'omitnan');
+            %}
             % Write bout
-            new_row = [boutstart boutend restlaryx restlaryy restjawx restjawy];
+            % new_row = [boutstart boutend restlaryx restlaryy restjawx restjawy];
+            new_row = [boutstart boutend];
             bout = [bout;new_row];
         end
         break
@@ -57,6 +60,7 @@ for i = 1:size(dlarydx,1)
     elseif sum < threshold && bouton == 1
         bouton = 0;
         % Get resting marker location
+        %{
         if size(bout,1) == 0
             if boutstart == 0
                 disp('No preceeding interval!');
@@ -71,8 +75,10 @@ for i = 1:size(dlarydx,1)
         restlaryy = mean(loc(low:high,11),'omitnan');
         restjawx = mean(loc(low:high,13),'omitnan');
         restjawy = mean(loc(low:high,14),'omitnan');
+        %}
         % Write bout
-        new_row = [boutstart boutend restlaryx restlaryy restjawx restjawy];
+        % new_row = [boutstart boutend restlaryx restlaryy restjawx restjawy];
+        new_row = [boutstart boutend];
         bout = [bout;new_row];
     end
 end

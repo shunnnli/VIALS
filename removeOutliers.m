@@ -1,4 +1,4 @@
-function [mato] = removeOutliers(mati,colnum)
+function [mato,outliers] = removeOutliers(mati,colnum)
 % removeOutliers remove outliers of laryngeal or jaw locations
 %   INPUT: loc, colnum
 %   OUTPUT: loc with the selected col analyzed
@@ -34,6 +34,10 @@ col = filloutliers(col,'linear','OutlierLocations',ol);
 
 % Fifth step: combine analyzed column to loc
 mato(:,colnum) = col;
+
+% Stored removed outliers
+outliers.salient = col;
+outliers.subtle = ol;
 
 end
 

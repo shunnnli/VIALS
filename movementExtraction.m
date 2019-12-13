@@ -3,14 +3,14 @@
 sessions = ["11-062419-1"; "11-062819-1"; "12-070519-2"; "13-090919-1";...
     "14-091519-1"; "18-102119-1"; "18-102519-1"; "18-102519-2";...
     "19-111119-1"];
-session = sessions(5);
+session = sessions(7);
 disp(session);
 
 % 0 = no swallow
 % 1 = 'DLC_resnet50_swallowing-trackingSep8shuffle1_1030000.csv';
 % 2 = 'DeepCut_resnet50_swallow-trackingSep18shuffle1_1030000.csv';
 % 3 = 'DLC_resnet50_swallow-no-markerNov22shuffle1_1030000.csv';
-swallowdlc = 0;
+swallowdlc = 1;
 [camdata,sideloc,bottomloc,swallowloc] = loadDLC(session,swallowdlc);
 
 %% Set camera calibration parameters

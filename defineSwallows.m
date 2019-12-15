@@ -10,7 +10,7 @@ ylaryvsjaw = loc(:,11) - loc(:,14);
 
 % Find peaks of laryngeal y trajectory
 [ylarypeaks,ylplocs] = findpeaks(ylaryvsjaw,...
-    'MinPeakDistance',15,'MinPeakProminence',0.1);
+    'MinPeakDistance',15,'MinPeakProminence',5);
 
 % Determine minimum height diff between two markers
 % mean height diff among tongueInFrame

@@ -1,4 +1,4 @@
-function [pswallow,threshold,allpeaks] = defineSwallows(loc,tp,camdata)
+function [pswallow,threshold] = defineSwallows(loc,tp,camdata)
 % defineSwallows: Find putative swallows from corrected laryngeal movements
 %   *: designed to be conservative (false positive is acceptable)
 %   INPUT: ylplocs (local maxima of corrected laryngeal movement)
@@ -11,11 +11,6 @@ ylaryvsjaw = loc(:,11) - loc(:,14);
 % Find peaks of laryngeal y trajectory
 [ylarypeaks,ylplocs,ylpw,ylpp] = findpeaks(ylaryvsjaw,...
     'MinPeakDistance',15,'MinPeakProminence',5);
-% Store data of all peaks
-allpeaks.pks = ylarypeaks;
-allpeaks.locs = ylplocs;
-allpeaks.w = ylpw;  % width
-allpeaks.p = ylpp;  % prominance
 
 % Determine minimum height diff between two markers
 % mean height diff among tongueInFrame
@@ -37,7 +32,7 @@ for i = 1:size(ylplocs)
         
         % add peak to pswallow if after filtering
         psid = psid + 1;
-        new_row = [psid,frame2time(frame,camdata),ylarypeaks(i)];
+        new_row = [psid,frame2time(frame,camdata),ylarypeaks(i),ylpw(i),ylpp(i)];
         pswallow = [pswallow; new_row];
     end
 end

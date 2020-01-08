@@ -19,7 +19,7 @@ bphigh = 3000;
 
 % Load single session data
 [camdata,loc] = loadLocData(session,start,stop,0);
-[tp,tpbout,lickbout,swallowbout] = loadLocAnalysis(session,loc,camdata,0);
+[tp,tpbout,lickbout,skinbout] = loadLocAnalysis(session,loc,camdata,0);
 [emg,emgenv] = loadEMG(bplow,bphigh,start,stop,camdata);
 
 % Reset tp.csv for multiple sessions
@@ -38,7 +38,7 @@ ylaryvsjaw = loc(:,11) - loc(:,14);
 
 % Find putative swallow
 % pswallow = [];
-[pswallow,inthres] = defineSwallows(loc,tp,camdata);
+[pswallow,inthres,allpeaks] = defineSwallows(loc,tp,camdata);
 % disp('Putative swallow found');
 
 % Further filtering of putative swallow

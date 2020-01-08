@@ -1,4 +1,4 @@
-function [tp,tpbout,lickbout,swallowbout] = loadLocAnalysis(session,loc,camdata,resetON)
+function [tp,tpbout,lickbout,skinbout] = loadLocAnalysis(session,loc,camdata,resetON)
 % loadLocAnalysis: Load or create files of analysis results of a session
 
 % tongue protrusion event log
@@ -45,15 +45,15 @@ if size(loc,2) > 9
     dlarydx = calcDerivative(loc(:,1),loc(:,11));
     swallowbout_path = strcat('Videos/',session,'/','swallowbout.csv');
     if isfile(swallowbout_path) && resetON == 0
-        swallowbout = readmatrix(swallowbout_path);
+        skinbout = readmatrix(swallowbout_path);
         disp('swallowbout.csv loaded');
     else
-        swallowbout = defineSwallowBout(loc,dlarydx,windowsize,threshold);
-        writematrix(swallowbout,swallowbout_path);
+        skinbout = defineSkinBout(loc,dlarydx,windowsize,threshold);
+        writematrix(skinbout,swallowbout_path);
         disp('swallowbout.csv created');
     end
 else
-    swallowbout = [];
+    skinbout = [];
 
 end
 

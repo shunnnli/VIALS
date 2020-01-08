@@ -1,4 +1,4 @@
-function bout = defineSwallowBout(loc,dlarydx,windowsize,threshold)
+function bout = defineSkinBout(loc,dlarydx,windowsize,threshold)
 %defineSwalllowBout
 % INPUT:
 %       loc, dlarydx (y-axis), windowsize, threshold

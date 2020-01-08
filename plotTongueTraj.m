@@ -1,4 +1,4 @@
-function [] = plotTongueTraj(phase,tpid,session,plane)
+function [] = plotTongueTraj(phase,tpid,session,plane,legendON)
 % plotTongueTraj: plot tongue trajectory given tpid
 %   INPUT: 
 %       phase: 1 -> separate protrusion, retraction, ILM
@@ -243,7 +243,9 @@ axis equal
 xlabel('ML')
 ylabel('AP')
 zlabel('DV')
-% legend('location','ne')
+if legendON == 1
+    legend('location','ne');
+end
 
 end
 

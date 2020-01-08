@@ -1,4 +1,4 @@
-function [b,total,pcadata,kmdata] = tpPCA(sessions,version,dim)
+function [b,total,pcadata,kmdata] = tpClustering(sessions,version,dim)
 % trajectoryPCA: return and plot results of PCA analysis
 %   INPUT:
 %       sessions: list of sessions to be analyzed

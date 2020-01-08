@@ -1,19 +1,26 @@
 %% Load files
+disp('----- Loading DLC and camdata files -----');
 % load session deeplabcut data
-sessions = ["11-062419-1"; "11-062819-1"; "12-070519-2"; "13-090919-1";...
+sessions = ["11-062019-1"; "11-062119-1"; "11-062219-1"; "11-062419-1"; "11-062819-1";...
+    "12-070519-2"; "13-090419-1"; "13-090919-1";...
     "14-091519-1"; "18-102119-1"; "18-102519-1"; "18-102519-2";...
     "19-111119-1"];
-session = sessions(7);
+session = sessions(2);
 disp(session);
 
 % 0 = no swallow
 % 1 = 'DLC_resnet50_swallowing-trackingSep8shuffle1_1030000.csv';
 % 2 = 'DeepCut_resnet50_swallow-trackingSep18shuffle1_1030000.csv';
 % 3 = 'DLC_resnet50_swallow-no-markerNov22shuffle1_1030000.csv';
-swallowdlc = 1;
+%{
+% sidecsv = 'DLC_resnet50_side-tongue-trackingJul31shuffle1_1030000.csv';
+% bottomcsv = 'DLC_resnet50_bottom-tongue-trackingAug2shuffle1_1030000.csv';
+%}
+swallowdlc = 0;
 [camdata,sideloc,bottomloc,swallowloc] = loadDLC(session,swallowdlc);
 
 %% Set camera calibration parameters
+disp('----- Set camera calibration parameters -----');
 % load calibration video
 scalvid = VideoReader(strcat('Videos/',session,'/side-',session,'.mp4'));
 bcalvid = VideoReader(strcat('Videos/',session,'/bottom-',session,'.mp4'));
@@ -27,6 +34,7 @@ imtool(bottomsnap);
 % imtool(sidesnap);
 
 %% Calibrate camera and reconstruct markers
+disp('----- Calibrate camera and reconstruct markers -----');
 loc_path = strcat('Videos/',session,'/','loc.csv');
 
 % Enter pixel distance between spout tip and tape (5 mm)
@@ -61,6 +69,7 @@ noswallow = ["11-062419-1"; "11-062819-1"; "12-070519-2"];
 swallow = ["13-090919-1";...
     "14-091519-1"; "18-102119-1"; "18-102519-1"; "18-102519-2";...
     "19-111119-1"];
+
 
 for i = 1:size(noswallow,1)
     swallowdlc = 0;

@@ -57,6 +57,7 @@ emgswallow = validateSwallow(emgenv,loc,tp,camdata);
 disp('----- Raster plot of event summary -----');
 
 % Raster plot
+% tp(any(isnan(tp(:,3)),2),:) = [];
 [rp,psaligned,esaligned] = plotRaster(tp,pswallow,emgswallow,camdata);
 rp_path = strcat('Videos/',session,'/','rp.svg');
 
@@ -64,14 +65,20 @@ rp_path = strcat('Videos/',session,'/','rp.svg');
 disp('----- Visualization of swallowing bout -----');
 
 % Trajectory plot
+%{
+19-111119-1;
+only es: 5x, 17x, 24, 25, 25, 27, 28, 33, 33, 35, 39, 40, 41
+%}
 
-% 38 only pswallow
-% floor = time2frame(110,camdata);
-% ceiling = floor + 1000;
+% Input time
+sid = 25;
+sdiff = -1;
+t = camdata.reward(sid,1) + sdiff - 1;
+% t = 95
 
 % False-positive swallows: 78, 111
-floor = time2frame(15,camdata);
-ceiling = floor + 1000;
+floor = time2frame(t,camdata);
+ceiling = floor + 600;
 time = frame2time(floor:ceiling,camdata);
 
 % ylaryvsjaw
@@ -80,11 +87,11 @@ lici = find(longici(:,3) >= floor & longici(:,4) <= ceiling);
 
 figure
 subplot(2,1,1)
-for i = 1:size(lici) 
-    xline(frame2time(longici(lici(i),3),camdata),'-b');
-    hold on
-    xline(frame2time(longici(lici(i),4),camdata),'-b'); 
-end 
+% for i = 1:size(lici) 
+%     xline(frame2time(longici(lici(i),3),camdata),'-b');
+%     hold on
+%     xline(frame2time(longici(lici(i),4),camdata),'-b'); 
+% end 
 hold on
 plotBouts('swallowbout',swallowbout,floor,ceiling,camdata);
 hold on
@@ -93,6 +100,8 @@ hold on
 plot(pswallow(:,2),pswallow(:,3),'or');
 hold on
 plotConditionalTraj('traj',frame2time(loc(:,1),camdata),ylaryvsjaw,tp);
+xlabel('Time (s)')
+ylabel('Marker height difference (a.u.)')
 xlim([time(1) time(length(time))]);
 
 % ylaryvsjaw + EMG
@@ -124,6 +133,8 @@ hold on
 plot(emgenv(envplocs,1),envpeaks,'oc');
 hold on
 plot(emgenv(emgswallow(:,3),1),emgswallow(:,4),'ob');
+xlabel('Time (s)')
+ylabel('EMG amplitude (a.u.)')
 xlim([time(1) time(length(time))]);
 
 %% Quantify swallow and licking movement
@@ -173,7 +184,7 @@ animal = all(2);
 % v2: 'dur','pLen','ampX/Y/Z','tpDevS/B','pPer/Vel','ilmPer/Vel','rPer/Vel'
 version = 2;
 dimension = 2;
-[b,total,pcadata,kmdata] = tpPCA(mid,version,dimension);
+[b,total,pcadata,kmdata] = tpClustering(mid,version,dimension);
 
 % figure
 % bar(1:size(pcadata.explained,1),pcadata.explained);
@@ -203,12 +214,15 @@ all = ["11-062419-1"; "11-062819-1"; "12-070519-2"; "13-090919-1";...
     "19-111119-1"];
 mid = ["11-062419-1";"14-091519-1"];  % total: 14856 (8186+)
 left = ["11-062819-1"; "12-070519-2"];  % total: 12576 (9074+)
-tp_path = strcat('Videos/',left(2),'/tp.csv');
+tp_path = strcat('Videos/',mid(1),'/tp.csv');
 tp = readmatrix(tp_path);
+
+% tpid = 
+disp(tp(tpid,:));
 
 % form a tp table
 % ctp = [];
-ctp = [ctp; tp(total(ne,2),:)];
+% ctp = [ctp; tp(total(ne,2),:)];
 
 %% Plot tongue trajectory
 disp('----- Plot tongue trajectory -----');
@@ -217,16 +231,17 @@ phase = 1;         % separate different lick phases or not
 
 mid = ["11-062419-1";"14-091519-1"];  % total: 14856 (8186+)
 left = ["11-062819-1";"12-070519-2"];  % total: 12576 (9074+)
-session = left(1);
+session = mid(1);
 disp(session);
 
-ctpid = transpose(ctp(:,1));
-tpid = ctpid(3);
+% ctpid = transpose(ctp(:,1));
+% tpid = ctpid(3);
+tpid = 276;
 % tpid = [2162 2566 1305 2409 2157; 2823 910 2442 1943 2626] + 17; % 12-070519-2, v1
 % tpid = [2841 2873 2880 2874 2856; 2568 2521 1142 2560 2601] + 17; % 12-070519-2, v2
 
 % figure
-plotTongueTraj(phase,tpid,session,0);
+plotTongueTraj(phase,tpid,session,0,1);
 
 %% Swallowing marker trajectories
 % --------------------- Laryngeal complex trajectory ---------------------
@@ -540,6 +555,31 @@ total = [total1; sid tp(:,[1 5 6:11 15:20])];
 "19-111119-1"
 %}
 
+%% Lick vs no lick
+% barplot = [];
+
+% dlc = nnz(tp(:,2));
+% nolick = size(tp,1) - lick;
+% lickometer = size(camdata.licking,1);
+% barplot = [barplot; dlc nolick lickometer];
+% session = [1 2 3 4 5];
+
+% Lickometer vs dlc bar plots
+%{
+figure
+bar(session,barplot);
+xlabel('Session number');
+ylabel('Number of licks detected');
+legend('VIALS-detected licks', 'Lickometer-detected licks')
+%}
+
+% lick vs no lick pie plots
+X = categorical({'Midline','Left-biased'});
+X = reordercats(X,{'Midline','Left-biased'});
+Y = [4.5 9.6];
+barh(X,Y)
+xlabel('Percentage of spout-missed licks');
+
 %% Delay of skin signal
 
 es = emgswallow([1:7 9:32 35:36 38 41:52 54:58],:);
@@ -589,6 +629,14 @@ hold on
 plotConditionalTraj('traj',frame2time(loc(:,1),camdata),ylaryvsjaw,tp);
 xlim([time(1) time(length(time))]);
 
+figure
+subplot(2,1,1)
+plot(frame2time(loc(:,1),camdata),loc(:,11));   % ylary
+xlabel('Time (s)')
+ylabel('Larynx marker height (a.u.)')
+xlim([time(1) time(length(time))]);
 subplot(2,1,2)
-plot(frame2time(loc(:,1),camdata),loc(:,11));
+plot(frame2time(loc(:,1),camdata),loc(:,14));   % yjaw
+xlabel('Time (s)')
+ylabel('Jaw marker height (a.u.)')
 xlim([time(1) time(length(time))]);

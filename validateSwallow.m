@@ -11,7 +11,7 @@ ylaryvsjaw = loc(:,11) - loc(:,14);
 
 % Find peaks of EMG envelope
 [envpeaks,envplocs] = findpeaks(emgenv(:,2),...
-    'MinPeakDistance',3000,'MinPeakProminence',20);
+    'MinPeakDistance',3000,'MinPeakProminence',25);
 % Find peaks of laryngeal y trajectory
 [ylarypeaks,ylplocs] = findpeaks(ylaryvsjaw,...
     'MinPeakDistance',15,'MinPeakProminence',5);

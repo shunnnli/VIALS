@@ -18,25 +18,26 @@ end
 islick = find(tpaligned(:,2) > 0,1);
 
 rp = figure('Name','Summary of events');
-xline(0,'-k','LineWidth',1);
+xline(0,'-k','LineWidth',1,'DisplayName','Reward onset');
 hold on
 if isempty(camdata.licking)
-    scatter(tpaligned(:,5),tpaligned(:,4),'.','MarkerEdgeColor','#0072BD');
+    scatter(tpaligned(:,5),tpaligned(:,4),'.',...
+        'MarkerEdgeColor','#0072BD','DisplayName','Lick');
 else
     scatter(tpaligned(1:islick,5),tpaligned(1:islick,4),...
-        '.','MarkerEdgeColor','#4DBEEE');   % not lick
+        '.','MarkerEdgeColor','#4DBEEE','DisplayName','Spout-missed lick');   % not lick
+    hold on
+    scatter(tpaligned(islick+1:size(tpaligned,1),5),...
+        tpaligned(islick+1:size(tpaligned,1),4),...
+        '.','MarkerEdgeColor','#0072BD','DisplayName','Spout-hit lick');   % is lick
 end
 hold on
-scatter(tpaligned(islick+1:size(tpaligned,1),5),...
-    tpaligned(islick+1:size(tpaligned,1),4),...
-    '.','MarkerEdgeColor','#0072BD');   % is lick
-hold on
 if ~isempty(pswallow)
-    scatter(psaligned(:,3),psaligned(:,2),'or');
+    scatter(psaligned(:,3),psaligned(:,2),'or','DisplayName','VIALS-detected swallow');
 end
 hold on
 if ~isempty(emgswallow)
-    scatter(esaligned(:,3),esaligned(:,2),'ok');
+    scatter(esaligned(:,3),esaligned(:,2),'ok','DisplayName','EMG-detected swallow');
 end
 
 xlim([-iti/2 iti/2]);

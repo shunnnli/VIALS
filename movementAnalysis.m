@@ -60,6 +60,7 @@ disp('----- Raster plot of event summary -----');
 % tp(any(isnan(tp(:,3)),2),:) = [];
 [rp,psaligned,esaligned] = plotRaster(tp,pswallow,emgswallow,camdata);
 rp_path = strcat('Videos/',session,'/','rp.svg');
+legend
 
 %% Swallowing bout visualized
 disp('----- Visualization of swallowing bout -----');
@@ -68,10 +69,11 @@ disp('----- Visualization of swallowing bout -----');
 %{
 19-111119-1;
 only es: 5x, 17x, 24, 25, 25, 27, 28, 33, 33, 35, 39, 40, 41
+only vs: 110-112s
 %}
 
 % Input time
-sid = 25;
+sid = 38;
 sdiff = -1;
 t = camdata.reward(sid,1) + sdiff - 1;
 % t = 95
@@ -93,7 +95,7 @@ subplot(2,1,1)
 %     xline(frame2time(longici(lici(i),4),camdata),'-b'); 
 % end 
 hold on
-plotBouts('swallowbout',swallowbout,floor,ceiling,camdata);
+% plotBouts('swallowbout',skinbout,floor,ceiling,camdata);
 hold on
 plot(frame2time(loc(:,1),camdata),ylaryvsjaw);
 hold on

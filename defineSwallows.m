@@ -18,8 +18,10 @@ allpeaks.w = ylpw;  % width
 allpeaks.p = ylpp;  % prominance
 
 % Determine minimum height diff between two markers
-% mean height diff among tongueInFrame
-threshold = nanmean(ylaryvsjaw(tp(:,36)));
+alltif = ylaryvsjaw(tp(:,36));  % all height diff of tongueInframe
+% threshold = nanmean(alltif);  % mean
+threshold = prctile(alltif,25); % 25%
+% threshold = min(alltif);
 
 
 % Find whether peaks in ylplocs concurred with tongue protrusion

@@ -1,4 +1,4 @@
-function [emgswallow] = validateSwallow(emgenv,loc,tp,camdata)
+function [emgswallow] = validateSwallow(threshold,emgenv,loc,tp,camdata)
 % Find putative swallow based on EMG
 % find EMG envelope peak without tongue protrusion
 %   OUTPUT:
@@ -15,10 +15,6 @@ ylaryvsjaw = loc(:,11) - loc(:,14);
 % Find peaks of laryngeal y trajectory
 [ylarypeaks,ylplocs] = findpeaks(ylaryvsjaw,...
     'MinPeakDistance',15,'MinPeakProminence',5);
-
-% Determine minimum height diff between two markers
-% mean height diff among tongueInFrame
-threshold = mean(ylaryvsjaw(tp(:,36)));
 
 % Find whether peaks in ylplocs concurred with tongue protrusion
 esid = 0;

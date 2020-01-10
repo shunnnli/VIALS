@@ -50,7 +50,7 @@ longici = findExtendedICI(tp,0.02);
 
 % Validate pswallow using EMG data
 % emgswallow = [];
-emgswallow = validateSwallow(emgenv,loc,tp,camdata);
+emgswallow = validateSwallow(inthres,emgenv,loc,tp,camdata);
 % disp('EMG swallow found');
 
 %% Raster plot
@@ -73,7 +73,7 @@ only vs: 110-112s
 %}
 
 % Input time
-rewardid = 40;
+rewardid = 3;
 rdiff = -1;
 t = camdata.reward(rewardid,1) + rdiff - 1;
 % t = 95
@@ -186,7 +186,7 @@ animal = all(2);
 % v2: 'dur','pLen','ampX/Y/Z','tpDevS/B','pPer/Vel','ilmPer/Vel','rPer/Vel'
 version = 2;
 dimension = 2;
-[b,total,pcadata,kmdata] = tpClustering(mid,version,dimension);
+[b,total,pcadata,kmdata] = tpClustering(left,version,dimension);
 
 % figure
 % bar(1:size(pcadata.explained,1),pcadata.explained);

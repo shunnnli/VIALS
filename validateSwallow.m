@@ -4,7 +4,7 @@ function [emgswallow] = validateSwallow(emgenv,loc,tp,camdata)
 %   OUTPUT:
 %       emgswallow = [esid, time, envplocs(i), envpeaks(i), nextpeak]
 
-maxlag = 0.2;
+maxlag = 0.2;   % 150 ms
 
 % lary corrected trajectory = Laryngeal - jaw
 ylaryvsjaw = loc(:,11) - loc(:,14);

@@ -73,9 +73,9 @@ only vs: 110-112s
 %}
 
 % Input time
-sid = 38;
-sdiff = -1;
-t = camdata.reward(sid,1) + sdiff - 1;
+rewardid = 40;
+rdiff = -1;
+t = camdata.reward(rewardid,1) + rdiff - 1;
 % t = 95
 
 % False-positive swallows: 78, 111

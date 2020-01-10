@@ -37,7 +37,7 @@ for i = 1:size(ylplocs)
         
         % add peak to pswallow if after filtering
         psid = psid + 1;
-        new_row = [psid,frame2time(frame,camdata),ylarypeaks(i)];
+        new_row = [psid,frame2time(frame,camdata),ylarypeaks(i),ylpp(i)];
         pswallow = [pswallow; new_row];
     end
 end

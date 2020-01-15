@@ -4,12 +4,12 @@ disp('----- Load loc and EMG data -----');
 sessions = ["11-062419-1"; "11-062819-1"; "12-070519-2"; "13-090919-1";...
     "14-091519-1"; "18-102119-1"; "18-102519-1"; "18-102519-2";...
     "19-111119-1"];
-session = sessions(9);
+session = sessions(7);
 disp(session);
 
 % Enter analysis window (in seconds)
 start = 0;
-stop = 120;
+stop = 9999;
 
 % Enter bandpass frequency
 % Based on Lever et al. (2009) 
@@ -73,10 +73,10 @@ only vs: 110-112s
 %}
 
 % Input time
-rewardid = 27;
-rdiff = -1;
-t = camdata.reward(rewardid,1) + rdiff - 1;
-% t = 95
+% rewardid = 27;
+% rdiff = -1;
+% t = camdata.reward(rewardid,1) + rdiff - 1;
+t = 12;
 
 % False-positive swallows: 78, 111
 floor = time2frame(t,camdata);
@@ -107,7 +107,6 @@ ylabel('Marker height difference (a.u.)')
 xlim([time(1) time(length(time))]);
 
 % ylaryvsjaw + EMG
-
 % Find peaks of EMG envelope
 [envpeaks,envplocs] = findpeaks(emgenv(:,2),...
     'MinPeakDistance',3000,'MinPeakProminence',20);
@@ -120,11 +119,12 @@ for i = 1:size(pks,1)
     xline(pswallow(pks(i),2),'-r');
 end
 hold on
-% for i = 1:size(lici) 
-%     xline(frame2time(longici(lici(i),3),camdata),'-b');
-%     hold on
-%     xline(frame2time(longici(lici(i),4),camdata),'-b'); 
-% end
+%{
+for i = 1:size(lici) 
+    xline(frame2time(longici(lici(i),3),camdata),'-b');
+    hold on
+    xline(frame2time(longici(lici(i),4),camdata),'-b'); 
+end
 hold on
 % for i = 1:size(camdata.reward,1)
 %     xline(camdata.reward(i),'-k');
@@ -132,6 +132,7 @@ hold on
 hold on
 % plotConditionalTraj('emg',frame2time(loc(:,1),camdata),emgenv,tp);
 hold on
+%}
 plot(emgenv(envplocs,1),envpeaks,'oc');
 hold on
 plot(emgenv(emgswallow(:,3),1),emgswallow(:,4),'ob');
@@ -618,26 +619,28 @@ end
 disp('Outliers removed');
 
 %% Test
-floor = time2frame(55,camdata);
-ceiling = floor + 1000;
+floor = time2frame(11.5,camdata);
+ceiling = floor + 500;
 time = frame2time(floor:ceiling,camdata);
 
 figure
-subplot(2,1,1)
+subplot(3,1,1)
 plot(frame2time(loc(:,1),camdata),ylaryvsjaw);
 hold on
 plot(pswallow(:,2),pswallow(:,3),'or');
 hold on
 plotConditionalTraj('traj',frame2time(loc(:,1),camdata),ylaryvsjaw,tp);
 xlim([time(1) time(length(time))]);
+xlabel('Time (s)')
+ylabel('Marker height difference (a.u.)')
 
-figure
-subplot(2,1,1)
+% figure
+subplot(3,1,2)
 plot(frame2time(loc(:,1),camdata),loc(:,11));   % ylary
 xlabel('Time (s)')
 ylabel('Larynx marker height (a.u.)')
 xlim([time(1) time(length(time))]);
-subplot(2,1,2)
+subplot(3,1,3)
 plot(frame2time(loc(:,1),camdata),loc(:,14));   % yjaw
 xlabel('Time (s)')
 ylabel('Jaw marker height (a.u.)')

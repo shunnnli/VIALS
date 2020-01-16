@@ -4,8 +4,8 @@ disp('----- Loading DLC and camdata files -----');
 sessions = ["11-062019-1"; "11-062119-1"; "11-062219-1"; "11-062419-1"; "11-062819-1";...
     "12-070519-2"; "13-090419-1"; "13-090919-1";...
     "14-091519-1"; "18-102119-1"; "18-102519-1"; "18-102519-2";...
-    "19-111119-1"];
-session = sessions(2);
+    "19-111119-1"; "20-200115-2"];
+session = sessions(14);
 disp(session);
 
 % 0 = no swallow
@@ -16,8 +16,10 @@ disp(session);
 % sidecsv = 'DLC_resnet50_side-tongue-trackingJul31shuffle1_1030000.csv';
 % bottomcsv = 'DLC_resnet50_bottom-tongue-trackingAug2shuffle1_1030000.csv';
 %}
-swallowdlc = 0;
-[camdata,sideloc,bottomloc,swallowloc] = loadDLC(session,swallowdlc);
+dlc.bottom = 0;
+dlc.side = 0;
+dlc.swallow = 1;
+[camdata,sideloc,bottomloc,swallowloc] = loadDLC(session,dlc);
 
 %% Set camera calibration parameters
 disp('----- Set camera calibration parameters -----');

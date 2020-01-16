@@ -22,8 +22,17 @@ bscale = [1 ratio(3) ratio(4) 1 ratio(3) ratio(4) 1];
 % minus marker height in swallowing y axis
 marker = [0 0 laryheight 0 0 jawheight 0]; 
 
-side = bsxfun(@times,bsxfun(@plus,bsxfun(@times,sideloc,yreverse),ysize),sscale);
-bottom = bsxfun(@times,bsxfun(@plus,bsxfun(@times,bottomloc,yreverse),ysize),bscale);
+if ~isempty(sideloc)
+    side = bsxfun(@times,bsxfun(@plus,bsxfun(@times,sideloc,yreverse),ysize),sscale);
+else
+    side = [];
+end
+
+if ~isempty(bottomloc)
+    bottom = bsxfun(@times,bsxfun(@plus,bsxfun(@times,bottomloc,yreverse),ysize),bscale);
+else
+    bottom = [];
+end
 
 if ~isempty(swallowloc)
     swallow = bsxfun(@minus,bsxfun(@times,bsxfun(@plus,bsxfun(@times,swallowloc,yreverse),ysize),sscale),marker);

@@ -1,4 +1,34 @@
-%% Past codes
+%% Breathing sesnor
+session = "20-200115-2";
+camdata = load(strcat('Videos/',session,'/times.mat'));
+breathing = [transpose((1:size(camdata.breathing,1))/30000),double(camdata.breathing)/20];
+
+% Apply filter
+Sampling_rate = 30000;
+setpt_cut = 1; % minimum frequency
+lowpass_cut = 15; % maximum frequency 15 Hz (for rat and mouse)
+filter_order = 3;
+ 
+breath = breathing(:,2);
+ 
+[bh ah] = butter(filter_order,setpt_cut/(Sampling_rate/2),"low"); % get set-point
+setpt_b = filtfilt(bh,ah,breath);
+[bl al] = butter(filter_order,lowpass_cut/(Sampling_rate/2),"low"); % lowpass
+breath_f = filtfilt(bl,al,breath);
+breath_fst = breath_f - setpt_b;
+phase_b = angle(hilbert(breath_fst));
+
+%% Draw traces
+floor = time2frame(9,camdata);
+ceiling = floor + 2000;
+time = frame2time(floor:ceiling,camdata);
+
+figure
+subplot(2,1,1)
+plot(breathing(:,1),breath_fst);
+subplot(2,1,2)
+plot(breathing(:,1),phase_b);
+% xlim([time(1) time(length(time))]);
 
 %% Displacement of a marker at a given moment from resting location
 %{

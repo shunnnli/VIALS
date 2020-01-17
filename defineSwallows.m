@@ -1,4 +1,4 @@
-function [pswallow,threshold,allpeaks] = defineSwallows(loc,tp,camdata)
+function [pswallow,jawthreshold,allpeaks] = defineSwallows(loc,tp,camdata)
 % defineSwallows: Find putative swallows from corrected laryngeal movements
 %   *: designed to be conservative (false positive is acceptable)
 %   INPUT: ylplocs (local maxima of corrected laryngeal movement)
@@ -20,14 +20,17 @@ allpeaks.w = ylpw;  % width
 allpeaks.p = ylpp;  % prominance
 
 % If jaw marker is too low --> not swallowing
+% calculate by the average of the middle of tongueInFrame and the next
+% frame of tongueInFrame
 alljh = yjaw(tp(:,36));  % all jaw height during tongueInFrame
-threshold = nanmean(alljh);  % mean
-% threshold = prctile(alljh,25); % 25%
-% threshold = min(alljh);
+jawthreshold = nanmean(alljh);  % mean
+% jawthreshold = prctile(alljh,25); % 25%
+% jawthreshold = min(alljh);
 
 % Find whether peaks in ylplocs concurred with tongue protrusion
 psid = 0;
 pswallow = [];
+
 tpRange = tp(:,35:36);
 for i = 1:size(ylplocs)
     frame = ylplocs(i);    % corresponding frame
@@ -44,14 +47,6 @@ for i = 1:size(ylplocs)
         pswallow = [pswallow; new_row];
     end
 end
-
-% Determine minimum height diff between two markers
-%{
-alltif = ylaryvsjaw(tp(:,36));  % all height diff of tongueInframe
-% threshold = nanmean(alltif);  % mean
-threshold = prctile(alltif,25); % 25%
-% threshold = min(alltif);
-%}
 
 end
 

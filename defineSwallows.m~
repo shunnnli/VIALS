@@ -6,8 +6,7 @@ function [pswallow,threshold,allpeaks] = defineSwallows(loc,tp,camdata)
 %   OUTPUT: pswallow = [psid, time, ylarypeaks(i)]
 
 % lary corrected trajectory = Laryngeal - jaw
-yjaw = loc(:,14);
-ylaryvsjaw = loc(:,11) - yjaw;
+ylaryvsjaw = loc(:,11) - loc(:,14);
 
 % Find peaks of laryngeal y trajectory
 [ylarypeaks,ylplocs,ylpw,ylpp] = findpeaks(ylaryvsjaw,...
@@ -20,7 +19,7 @@ allpeaks.w = ylpw;  % width
 allpeaks.p = ylpp;  % prominance
 
 % If jaw marker is too low --> not swallowing
-alljh = yjaw(tp(:,36));  % all jaw height during tongueInFrame
+alljh = loc(tp(:,36),14);  % all jaw height during tongueInFrame
 threshold = nanmean(alljh);  % mean
 % threshold = prctile(alljh,25); % 25%
 % threshold = min(alljh);
@@ -34,7 +33,7 @@ for i = 1:size(ylplocs)
     inRange = find(frame >= tpRange(:,1) & frame <= tpRange(:,2), 1);
     if isempty(inRange)
         % Filter if lary & jaw are around the same height (tongue must be out)
-        if yjaw <= threshold
+        if yjaw >= threshold
             continue
         end
         

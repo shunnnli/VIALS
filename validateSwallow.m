@@ -7,12 +7,14 @@ function [emgswallow] = validateSwallow(emgenv,loc,tp,camdata)
 maxlag = 0.2;   % 150 ms
 
 % lary corrected trajectory = Laryngeal - jaw
-revjaw = -loc(:,14);
+yjaw = loc(:,14);
+revjaw = loc(:,11) - yjaw;
 
-% Determine minimum height diff between two markers
-alltif = revjaw(tp(:,36));  % all height diff of tongueInframe
-% threshold = nanmean(alltif);  % mean
-jawthreshold = prctile(alltif,25); % 25%
+% If jaw marker is too low --> not swallowing
+alljh = yjaw(tp(:,36));  % all jaw height during tongueInFrame
+jawthreshold = nanmean(alljh);  % mean
+% jawthreshold = prctile(alljh,25); % 25%
+% jawthreshold = min(alljh);
 
 % Find peaks of EMG envelope
 [envpeaks,envplocs] = findpeaks(emgenv(:,2),...
@@ -35,7 +37,7 @@ for i = 1:size(envplocs)
         istp = find(nextpeak >= tpRange(:,1) & nextpeak <= tpRange(:,2), 1);
         if isempty(istp)
             % Filter if lary & jaw are around the same height (tongue must be out)
-            if peaks(nextpeakloc) >= jawthreshold
+            if yjaw(nextpeakloc) <= jawthreshold
                 continue
             end
             % add peak to emgswallow if after filtering

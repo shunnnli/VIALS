@@ -12,13 +12,10 @@ disp(session);
 % 1 = 'DLC_resnet50_swallowing-trackingSep8shuffle1_1030000.csv';
 % 2 = 'DeepCut_resnet50_swallow-trackingSep18shuffle1_1030000.csv';
 % 3 = 'DLC_resnet50_swallow-no-markerNov22shuffle1_1030000.csv';
-%{
-% sidecsv = 'DLC_resnet50_side-tongue-trackingJul31shuffle1_1030000.csv';
-% bottomcsv = 'DLC_resnet50_bottom-tongue-trackingAug2shuffle1_1030000.csv';
-%}
+
 dlc.bottom = 0;
-dlc.side = 0;
-dlc.swallow = 1;
+dlc.side = 1;
+dlc.swallow = 4;
 [camdata,sideloc,bottomloc,swallowloc] = loadDLC(session,dlc);
 
 %% Set camera calibration parameters

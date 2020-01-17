@@ -16,34 +16,28 @@ for i = 1:size(tp,1)
        if abs(outtime - reward(1)) > iti/2
            continue
        end
-       new = [tp(i,1) tp(i,2) tp(i,33) rewardnum outtime-reward(1)];
-       aligned = [aligned; new];
+       aligned = [aligned; tp(i,1) tp(i,2) tp(i,33) rewardnum outtime-reward(1)];
    % if tp happens in the first iti/2s after the reward
    elseif lag <= iti/2 && lag > 0
-       new = [tp(i,1) tp(i,2) tp(i,33) rewardnum lag];
-       aligned = [aligned; new];
+       aligned = [aligned; tp(i,1) tp(i,2) tp(i,33) rewardnum lag];
    % if tp happens in the second iti/2s after the reward and rewardnum
    % has not been updated
    elseif lag > iti/2 && lag > 0
        rewardnum = rewardnum + 1;
        if rewardnum > size(reward,1)
            rewardnum = size(reward,1);
-           new = [tp(i,1) tp(i,2) tp(i,33) rewardnum+1 lag];
-           aligned = [aligned; new];
+           aligned = [aligned; tp(i,1) tp(i,2) tp(i,33) rewardnum+1 lag];
        else
-           new = [tp(i,1) tp(i,2) tp(i,33) rewardnum lag];
-           aligned = [aligned; new];
+           aligned = [aligned; tp(i,1) tp(i,2) tp(i,33) rewardnum lag];
        end
    % if tp happens in the second iti/2s after the reward and rewardnum
    % has been updated 
    elseif lag < 0 && abs(lag) < iti/2
        if rewardnum > size(reward,1)
            rewardnum = size(reward,1);
-           new = [tp(i,1) tp(i,2) tp(i,33) rewardnum+1 lag];
-           aligned = [aligned; new];
+           aligned = [aligned; tp(i,1) tp(i,2) tp(i,33) rewardnum+1 lag];
        else
-           new = [tp(i,1) tp(i,2) tp(i,33) rewardnum lag];
-           aligned = [aligned; new];
+           aligned = [aligned; tp(i,1) tp(i,2) tp(i,33) rewardnum lag];
        end
    else
        disp(strcat('alignTP error!'));

@@ -4,7 +4,7 @@ disp('----- Load loc and EMG data -----');
 sessions = ["11-062419-1"; "11-062819-1"; "12-070519-2"; "13-090919-1";...
     "14-091519-1"; "18-102119-1"; "18-102519-1"; "18-102519-2";...
     "19-111119-1"; "20-200115-2"];
-session = sessions(7);
+session = sessions(10);
 disp(session);
 
 % Enter analysis window (in seconds)
@@ -21,6 +21,7 @@ bphigh = 3000;
 [camdata,loc] = loadLocData(session,start,stop,0);
 [tp,tpbout,lickbout,skinbout] = loadLocAnalysis(session,loc,camdata,0);
 [emg,emgenv] = loadEMG(bplow,bphigh,start,stop,camdata);
+breathing = loadBreathing(start,stop,camdata);
 
 % Reset tp.csv for multiple sessions
 % for i = 1:size(sessions,1)
@@ -45,7 +46,7 @@ ylaryvsjaw = loc(:,11) - loc(:,14);
 % 2. if laryngeal does not move
 
 % Find extended ILIs (longer than 20ms)
-longici = findExtendedICI(tp,0.02);
+% longici = findExtendedICI(tp,0.02);
 % disp('Extended ICI found');
 
 % Validate pswallow using EMG data
@@ -58,7 +59,7 @@ disp('----- Raster plot of event summary -----');
 
 % Raster plot
 % tp(any(isnan(tp(:,3)),2),:) = [];
-[rp,psaligned,esaligned] = plotRaster(tp,pswallow,emgswallow,camdata);
+[rp,aligned] = plotRaster(tp,pswallow,emgswallow,camdata);
 rp_path = strcat('Videos/',session,'/','rp.svg');
 legend
 
@@ -77,18 +78,16 @@ only vs: 110-112s
 % rdiff = -1;
 % t = camdata.reward(rewardid,1) + rdiff - 1;
 t = 12;
-
-% False-positive swallows: 78, 111
 floor = time2frame(t,camdata);
-ceiling = floor + 600;
+ceiling = floor + 1000;
 time = frame2time(floor:ceiling,camdata);
 
 % ylaryvsjaw
 pks = find(pswallow(:,2) >= time(1) & pswallow(:,2) <= time(size(time,1)));
-lici = find(longici(:,3) >= floor & longici(:,4) <= ceiling);
+% lici = find(longici(:,3) >= floor & longici(:,4) <= ceiling);
 
 figure
-subplot(2,1,1)
+subplot(4,1,1)
 % for i = 1:size(lici) 
 %     xline(frame2time(longici(lici(i),3),camdata),'-b');
 %     hold on
@@ -106,12 +105,19 @@ xlabel('Time (s)')
 ylabel('Marker height difference (a.u.)')
 xlim([time(1) time(length(time))]);
 
+% Breathing
+subplot(4,1,2)
+plot(breathing.raw(:,1),breathing.trace);
+xlim([time(1) time(length(time))]);
+subplot(4,1,3)
+plot(breathing.raw(:,1),breathing.phase);
+xlim([time(1) time(length(time))]);
+
 % ylaryvsjaw + EMG
 % Find peaks of EMG envelope
 [envpeaks,envplocs] = findpeaks(emgenv(:,2),...
     'MinPeakDistance',3000,'MinPeakProminence',20);
-
-subplot(2,1,2)
+subplot(4,1,4)
 plot(emg(:,1),emg(:,2),'Color','#4DBEEE');
 hold on
 plot(emgenv(:,1),emgenv(:,2),'LineWidth',1);

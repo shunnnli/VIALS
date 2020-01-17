@@ -3,10 +3,10 @@ function [emg,emgenv] = loadEMG(bplow,bphigh,start,stop,camdata)
 %   Detailed explanation goes here
 
 % adc = [time adc_value]
-adc = [transpose((1:size(camdata.adc,1))/30000), double(camdata.adc)/20];
+adc = [transpose((1:size(camdata.emg,1))/30000), double(camdata.emg)/20];
 
 if ~(start == 0 && stop >= 9999)
-    % Apply time frame to camdata.adc
+    % Apply time frame to camdata.emg
     [~,startrow] = min(abs(adc(:,1)-start));
     [~,stoprow] = min(abs(adc(:,1)-stop));
     adc = adc(startrow:stoprow,:);

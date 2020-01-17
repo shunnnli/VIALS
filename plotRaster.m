@@ -1,4 +1,4 @@
-function [rp,psaligned,esaligned] = plotRaster(tp,pswallow,emgswallow,camdata)
+function [rp,aligned] = plotRaster(tp,pswallow,emgswallow,camdata)
 %UNTITLED5 Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -14,13 +14,15 @@ end
 
 if ~isempty(emgswallow)
     esaligned = alignSwallow(emgswallow,camdata,iti);
+else
+    esaligned = [];
 end
 islick = find(tpaligned(:,2) > 0,1);
 
 rp = figure('Name','Summary of events');
 xline(0,'-k','LineWidth',1,'DisplayName','Reward onset');
 hold on
-if isempty(camdata.licking)
+if size(camdata.licking,1) < 2
     scatter(tpaligned(:,5),tpaligned(:,4),'.',...
         'MarkerEdgeColor','#0072BD','DisplayName','Lick');
 else
@@ -44,6 +46,10 @@ xlim([-iti/2 iti/2]);
 ylim([0 max(tpaligned(size(tpaligned,1),4),psaligned(size(psaligned,1),2))]);
 xlabel('Time from reward (s)');
 ylabel('Reward number');
+
+aligned.tp = tpaligned;
+aligned.es = esaligned;
+aligned.ps = psaligned;
 
 end
 

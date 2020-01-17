@@ -19,8 +19,8 @@ allpeaks.p = ylpp;  % prominance
 
 % Determine minimum height diff between two markers
 alltif = ylaryvsjaw(tp(:,36));  % all height diff of tongueInframe
-threshold = nanmean(alltif);  % mean
-% threshold = prctile(alltif,25); % 25%
+% threshold = nanmean(alltif);  % mean
+threshold = prctile(alltif,25); % 25%
 % threshold = min(alltif);
 
 

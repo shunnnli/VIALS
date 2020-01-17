@@ -17,20 +17,20 @@ else
     bottomloc = [];
 end
 
-if dlc.swallow == 1 || dlc.swallow == 2 || dlc.swallow == 3
+if dlc.swallow ~= 0
     if dlc.swallow == 1
         swallowcsv = 'DLC_resnet50_swallowing-trackingSep8shuffle1_1030000.csv';
     elseif dlc.swallow == 2
         swallowcsv = 'DeepCut_resnet50_swallow-trackingSep18shuffle1_1030000.csv';
-    else
+    elseif dlc.swallow == 3
         swallowcsv = 'DLC_resnet50_swallow-no-markerNov22shuffle1_1030000.csv';
+    elseif dlc.swallow == 4
+        swallowcsv = 'DLC_resnet50_swallowing-trackingSep8shuffle1_1000000.csv';
     end
     swallowraw = readmatrix(strcat('Videos/',session,'/side-',session,swallowcsv));
     swallowloc = [(swallowraw(:,1)+1),swallowraw(:,(2:end))];
-elseif dlc.swallow == 0
-    swallowloc = [];
 else
-    disp('Incorrect dlc.swallow');
+    swallowloc = [];
 end
     
 disp('dlc csv loaded');

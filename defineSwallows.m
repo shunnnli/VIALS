@@ -22,8 +22,9 @@ allpeaks.p = ylpp;  % prominance
 % If jaw marker is too low --> not swallowing
 % calculate by the average of the middle of tongueInFrame and the next
 % frame of tongueInFrame
-alljh = yjaw(tp(:,36));  % all jaw height during tongueInFrame
-jawthreshold = nanmean(alljh);  % mean
+jawtif = nanmean(yjaw(tp(:,36)));  % mean jaw height during tongueInFrame
+jawtin = nanmean(yjaw(tp(:,36)+1));    % mean jaw height during tIF+1
+jawthreshold = (jawtif+jawtin)/2;
 % jawthreshold = prctile(alljh,25); % 25%
 % jawthreshold = min(alljh);
 
@@ -37,7 +38,7 @@ for i = 1:size(ylplocs)
     inRange = find(frame >= tpRange(:,1) & frame <= tpRange(:,2), 1);
     if isempty(inRange)
         % Filter if lary & jaw are around the same height (tongue must be out)
-        if yjaw <= threshold
+        if yjaw(frame) <= jawthreshold
             continue
         end
         

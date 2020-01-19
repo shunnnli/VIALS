@@ -1,5 +1,5 @@
 %% Breathing sesnor
-session = "20-200115-2";
+session = "20-200117-1";
 camdata = load(strcat('Videos/',session,'/times.mat'));
 breathing = [transpose((1:size(camdata.breathing,1))/30000),double(camdata.breathing)/20];
 
@@ -19,16 +19,17 @@ breath_fst = breath_f - setpt_b;
 phase_b = angle(hilbert(breath_fst));
 
 %% Draw traces
-floor = time2frame(9,camdata);
+floor = time2frame(100,camdata);
 ceiling = floor + 2000;
 time = frame2time(floor:ceiling,camdata);
 
 figure
 subplot(2,1,1)
 plot(breathing(:,1),breath_fst);
+xlim([time(1) time(length(time))]);
 subplot(2,1,2)
 plot(breathing(:,1),phase_b);
-% xlim([time(1) time(length(time))]);
+xlim([time(1) time(length(time))]);
 
 %% Displacement of a marker at a given moment from resting location
 %{

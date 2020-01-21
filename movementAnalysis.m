@@ -3,8 +3,8 @@ disp('----- Load loc and EMG data -----');
 
 sessions = ["11-062419-1"; "11-062819-1"; "12-070519-2"; "13-090919-1";...
     "14-091519-1"; "18-102119-1"; "18-102519-1"; "18-102519-2";...
-    "19-111119-1"; "20-200115-2"];
-session = sessions(10);
+    "19-111119-1"; "20-200115-2"; "20-200117-1"];
+session = sessions(11);
 disp(session);
 
 % Enter analysis window (in seconds)
@@ -146,6 +146,27 @@ plot(emgenv(emgswallow(:,3),1),emgswallow(:,4),'ob');
 xlabel('Time (s)')
 ylabel('EMG amplitude (a.u.)')
 xlim([time(1) time(length(time))]);
+
+%% Breathing and swallowing
+swins = 0;
+sb = [];
+for i = 1:size(pswallow,1)
+    [~,index] = findClosest(breathing.raw(:,1),pswallow(i,2));
+    % if pswallow happens during in inspiration (dbreathing < -500)
+    if breathing.d(index) <= -500
+        swins = swins + 1;
+    end
+    sb = [sb; pswallow(i,1) pswallow(i,2),...
+        breathing.trace(index) breathing.phase(index) breathing.d(index)];
+end
+
+figure
+histogram(sb(:,3));
+figure
+histogram(sb(:,4));
+figure
+histogram(sb(:,5));
+
 
 %% Quantify swallow and licking movement
 disp('----- Quantify swallow and lick movement -----');
@@ -627,7 +648,7 @@ disp('Outliers removed');
 
 %% Test
 floor = time2frame(11.5,camdata);
-ceiling = floor + 500;
+ceiling = floor + 1000;
 time = frame2time(floor:ceiling,camdata);
 
 figure

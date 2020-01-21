@@ -22,9 +22,12 @@ breath_f = filtfilt(bl,al,raw(:,2));
 breath = breath_f - setpt_b;
 bphase = angle(hilbert(breath));
 
+dbreathing = [0; calcDerivative(raw(:,1),breath)];
+
 breathing.raw = raw;
 breathing.trace = breath;
 breathing.phase = bphase;
+breathing.d = dbreathing;
 disp('Breathing loaded');
 
 end

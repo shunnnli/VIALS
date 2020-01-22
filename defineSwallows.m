@@ -7,10 +7,10 @@ function [pswallow,jawthreshold,allpeaks] = defineSwallows(loc,tp,camdata)
 
 % lary corrected trajectory = Laryngeal - jaw
 yjaw = loc(:,14);
-ylaryvsjaw = loc(:,11) - yjaw;
+hdiff = loc(:,11) - yjaw;
 
 % Find peaks of laryngeal y trajectory
-[ylarypeaks,ylplocs,ylpw,ylpp] = findpeaks(ylaryvsjaw,...
+[ylarypeaks,ylplocs,ylpw,ylpp] = findpeaks(hdiff,...
     'MinPeakDistance',15,'MinPeakProminence',5);
 
 % Store data of all peaks

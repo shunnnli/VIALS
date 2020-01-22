@@ -4,15 +4,16 @@ function [emgswallow] = validateSwallow(emgenv,loc,tp,camdata)
 %   OUTPUT:
 %       emgswallow = [esid, time, envplocs(i), envpeaks(i), nextpeak]
 
-maxlag = 0.2;   % 150 ms
+maxlag = 0.2;   % 200 ms
 
 % lary corrected trajectory = Laryngeal - jaw
 yjaw = loc(:,14);
-revjaw = loc(:,11) - yjaw;
+hdiff = loc(:,11) - yjaw;
 
 % If jaw marker is too low --> not swallowing
-alljh = yjaw(tp(:,36));  % all jaw height during tongueInFrame
-jawthreshold = nanmean(alljh);  % mean
+jawtif = nanmean(yjaw(tp(:,36)));  % mean jaw height during tongueInFrame
+jawtin = nanmean(yjaw(tp(:,36)+1));    % mean jaw height during tIF+1
+jawthreshold = (jawtif+jawtin)/2;
 % jawthreshold = prctile(alljh,25); % 25%
 % jawthreshold = min(alljh);
 
@@ -20,7 +21,7 @@ jawthreshold = nanmean(alljh);  % mean
 [envpeaks,envplocs] = findpeaks(emgenv(:,2),...
     'MinPeakDistance',3000,'MinPeakProminence',30);
 % Find peaks of laryngeal y trajectory
-[peaks,locs] = findpeaks(revjaw,'MinPeakDistance',15,'MinPeakProminence',5);
+[~,locs] = findpeaks(hdiff,'MinPeakDistance',15,'MinPeakProminence',5);
 
 % Find whether peaks in ylplocs concurred with tongue protrusion
 esid = 0;

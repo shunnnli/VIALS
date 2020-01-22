@@ -4,7 +4,7 @@ camdata = load(strcat('Videos/',session,'/times.mat'));
 
 % Apply analysis window (in seconds)
 % duration = stop - start;
-if ~(start == 0 && stop >= 9999)
+if ~(start == 0 && stop >= Inf)
     % Apply time frame to loc
     wholeloc = readmatrix(strcat('Videos/',session,'/','loc.csv'));
     [~,startframe] = min(abs(camdata.times(:,2)-start));

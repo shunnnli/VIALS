@@ -4,12 +4,12 @@ disp('----- Load loc and EMG data -----');
 sessions = ["11-062419-1"; "11-062819-1"; "12-070519-2"; "13-090919-1";...
     "14-091519-1"; "18-102119-1"; "18-102519-1"; "18-102519-2";...
     "19-111119-1"; "20-200115-2"; "20-200117-1"];
-session = sessions(11);
+session = sessions(9);
 disp(session);
 
 % Enter analysis window (in seconds)
 start = 0;
-stop = 9999;
+stop = 120;
 
 % Enter bandpass frequency
 % Based on Lever et al. (2009) 
@@ -34,9 +34,15 @@ breathing = loadBreathing(start,stop,camdata);
 %% Swallowing identification
 disp('----- Swallowing identification -----');
 
-% lary corrected trajectory = Laryngeal - jaw
-ylaryvsjaw = loc(:,11) - loc(:,14);
-% disp('ylaryvsjaw[] generated');
+% Marker height diff = Laryngeal - jaw
+hdiff = loc(:,11) - loc(:,14);
+% disp('hdiff[] generated');
+
+% Accelaration of vertical jaw and hdiff
+velyjaw = [0; calcDerivative(frame2time(loc(:,1),camdata),loc(:,14))];
+accyjaw = [0; calcDerivative(frame2time(loc(:,1),camdata),velyjaw)];
+velhdiff = [0; calcDerivative(frame2time(loc(:,1),camdata),hdiff)];
+acchdiff = [0; calcDerivative(frame2time(loc(:,1),camdata),velhdiff)];
 
 % Find putative swallow
 % pswallow = [];
@@ -75,15 +81,15 @@ only vs: 110-112s
 %}
 
 % Input time
-% rewardid = 27;
-% rdiff = -1;
-% t = camdata.reward(rewardid,1) + rdiff - 1;
-t = 12;
+rewardid = 20;
+rdiff = -1;
+t = camdata.reward(rewardid,1) + rdiff - 1;
+% t = 15;
 floor = time2frame(t,camdata);
 ceiling = floor + 1000;
 time = frame2time(floor:ceiling,camdata);
 
-% ylaryvsjaw
+% hdiff
 pks = find(pswallow(:,2) >= time(1) & pswallow(:,2) <= time(size(time,1)));
 % lici = find(longici(:,3) >= floor & longici(:,4) <= ceiling);
 
@@ -97,11 +103,11 @@ subplot(4,1,1)
 hold on
 % plotBouts('swallowbout',skinbout,floor,ceiling,camdata);
 hold on
-plot(frame2time(loc(:,1),camdata),ylaryvsjaw);
+plot(frame2time(loc(:,1),camdata),hdiff);
 hold on
 plot(pswallow(:,2),pswallow(:,3),'or');
 hold on
-plotConditionalTraj('traj',frame2time(loc(:,1),camdata),ylaryvsjaw,tp);
+plotConditionalTraj('traj',frame2time(loc(:,1),camdata),hdiff,tp);
 xlabel('Time (s)')
 ylabel('Marker height difference (a.u.)')
 xlim([time(1) time(length(time))]);
@@ -109,12 +115,21 @@ xlim([time(1) time(length(time))]);
 % Breathing
 subplot(4,1,2)
 plot(breathing.raw(:,1),breathing.trace);
-xlim([time(1) time(length(time))]);
-subplot(4,1,3)
-plot(breathing.raw(:,1),breathing.phase);
+hold on
+for i = 1:size(pks,1)
+    xline(pswallow(pks(i),2),'-r');
+end
 xlim([time(1) time(length(time))]);
 
-% ylaryvsjaw + EMG
+subplot(4,1,3)
+plot(breathing.raw(:,1),breathing.phase);
+hold on
+for i = 1:size(pks,1)
+    xline(pswallow(pks(i),2),'-r');
+end
+xlim([time(1) time(length(time))]);
+
+% hdiff + EMG
 % Find peaks of EMG envelope
 [envpeaks,envplocs] = findpeaks(emgenv(:,2),...
     'MinPeakDistance',3000,'MinPeakProminence',20);
@@ -160,11 +175,12 @@ for i = 1:size(pswallow,1)
         breathing.trace(index) breathing.phase(index) breathing.d(index)];
 end
 
+%%
 figure
 histogram(sb(:,3));
 figure
 histogram(sb(:,4));
-figure
+figure 
 histogram(sb(:,5));
 
 
@@ -469,11 +485,11 @@ end
 hold on
 plotBouts('swallowbout',swallowbout,floor,ceiling);
 hold on
-plot(loc(floor:ceiling,1),ylaryvsjaw(floor:ceiling),'DisplayName','Laryngeal y corrected');
+plot(loc(floor:ceiling,1),hdiff(floor:ceiling),'DisplayName','Laryngeal y corrected');
 hold on
 plot(pswallow(pks,2),pswallow(pks,3),'or');
 hold on
-plotConditionalTraj('tp',loc(:,1),ylaryvsjaw,tp,floor,ceiling);
+plotConditionalTraj('tp',loc(:,1),hdiff,tp,floor,ceiling);
 
 % figure
 % plotILI(bid,lickbout,tp,'frame');
@@ -653,11 +669,11 @@ time = frame2time(floor:ceiling,camdata);
 
 figure
 subplot(3,1,1)
-plot(frame2time(loc(:,1),camdata),ylaryvsjaw);
+plot(frame2time(loc(:,1),camdata),hdiff);
 hold on
 plot(pswallow(:,2),pswallow(:,3),'or');
 hold on
-plotConditionalTraj('traj',frame2time(loc(:,1),camdata),ylaryvsjaw,tp);
+plotConditionalTraj('traj',frame2time(loc(:,1),camdata),hdiff,tp);
 xlim([time(1) time(length(time))]);
 xlabel('Time (s)')
 ylabel('Marker height difference (a.u.)')

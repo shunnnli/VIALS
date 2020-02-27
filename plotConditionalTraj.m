@@ -7,7 +7,7 @@ function [] = plotConditionalTraj(ytype,xaxis,yaxis,condArr)
 %       condArr: usually tp
 
 for i = 1:size(condArr,1)
-    if strcmp('traj',ytype) 
+    if strcmp('traj',ytype)
         plot(xaxis(condArr(i,35):condArr(i,36)),...
             yaxis(condArr(i,35):condArr(i,36)),'Color', 'k');
     elseif strcmp('emg',ytype)

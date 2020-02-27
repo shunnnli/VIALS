@@ -1,4 +1,4 @@
-function [mato,outliers] = removeOutliers(mati,colnum)
+function [mato,outliers] = removeOutliers(mati,colnum,smoothON)
 % removeOutliers remove outliers of laryngeal or jaw locations
 %   INPUT: loc, colnum
 %   OUTPUT: loc with the selected col analyzed
@@ -12,7 +12,7 @@ col = filloutliers(mati(:,colnum),'linear','movmedian',15);
 ol = [false(1);isoutlier(diff(col),'gesd')];
 
 % Third step: make ol == 1 if frames nearby are also outliers
-for i = 1:size(ol)
+for i = 1:size(ol)-5
     if i ~= 1 && ol(i-1) == 1 && ol(i) == 0
         if sum(ol(i:i+5)) > 0
             ol(i) = true(1);
@@ -33,7 +33,12 @@ end
 col = filloutliers(col,'linear','OutlierLocations',ol);
 
 % Fifth step: combine analyzed column to loc
-mato(:,colnum) = col;
+if smoothON == 1
+    mato(:,colnum) = smoothdata(col,'movmedian',3);
+    disp('Data smoothing on: moving median 3');
+else
+    mato(:,colnum) = col;
+end
 
 % Stored removed outliers
 outliers.salient = col;

@@ -35,11 +35,12 @@ else
 end
 hold on
 if ~isempty(pswallow)
-    scatter(psaligned(:,3),psaligned(:,2),'or','DisplayName','VIALS-detected swallow');
+    scatter(psaligned(:,3),psaligned(:,2),36,psaligned(:,4),'o',...
+        'LineWidth',1,'DisplayName','VIALS-detected swallow');
 end
 hold on
 if ~isempty(emgswallow)
-    scatter(esaligned(:,3),esaligned(:,2),'ok','DisplayName','EMG-detected swallow');
+    scatter(esaligned(:,3),esaligned(:,2),'*k','DisplayName','EMG-detected swallow');
 end
 
 xlim([-iti/2 iti/2]);

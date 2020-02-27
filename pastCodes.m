@@ -259,3 +259,93 @@ legend;
 
 disp('----------------------');
 %}
+
+%% DFT swallowing bout analysis
+%{
+% t = 0:0.006:10-0.0006; % Time vector
+% x = sin(2*pi*15*t) + sin(2*pi*40*t);      % Signal
+
+xaxis = loc(swallowbout(1,1):swallowbout(1,2),10);
+yaxis = loc(swallowbout(1,1):swallowbout(1,2),11);
+x = fft(xaxis);
+y = fft(yaxis);
+
+% x axis 
+magnitude = abs(x);            
+x(magnitude < 1e-6) = 0;
+phase = unwrap(angle(x));
+f = (0:length(x)-1)/(length(x) * 0.006); % Frequency vector
+
+figure
+subplot(3,1,1)
+plot(xaxis)
+title('Trace x')
+subplot(3,1,2)
+plot(f(2:length(x)/2),magnitude(2:length(x)/2));
+title('Magnitude x')
+subplot(3,1,3)
+plot(f,phase*180/pi)
+title('Phase x')
+
+% y axis
+magnitude = abs(y);            
+y(magnitude < 1e-6) = 0;
+phase = unwrap(angle(y));
+f = (0:length(y)-1)/(length(y) * 0.006); % Frequency vector
+
+figure
+subplot(3,1,1)
+plot(yaxis)
+title('Trace y')
+subplot(3,1,2)
+plot(f(2:length(y)/2),magnitude(2:length(y)/2));
+title('Magnitude y')
+subplot(3,1,3)
+plot(f,phase*180/pi)
+title('Phase y')
+%}
+
+disp('----------------------');
+
+%% Plot marker trajectory (video)
+%{
+traj = figure('Name','Trajectory');
+ljt = animatedline('Color', 'b');           % lowerJaw trajectory
+spt = animatedline('Color', 'g');           % spout trajectory
+twt = animatedline('Color', '#EDB120');     % trident whisker trajectory
+ttt = animatedline('Color', 'r');           % tongueTip trajectory
+yflip = 650;
+
+vid_path = strcat('Videos/',session,'/','trajactories.avi');
+myVideo = VideoWriter(vid_path,'Uncompressed AVI');
+open(myVideo);
+
+for cur = 1:size(subloc,1)
+    hold on
+    if subloc(cur,4) >= 0.95
+        % addpoints(ljt, subloc(cur,2), yflip+(yflip-subloc(cur,3)));
+        addpoints(ljt, subloc(cur,2), subloc(cur,3));
+    end
+    if subloc(cur,7) >= 0.95
+        % addpoints(spt, subloc(cur,5), yflip+(yflip-subloc(cur,6)));
+        addpoints(spt, subloc(cur,5), subloc(cur,6));
+    end
+    if subloc(cur,10) >= 0.95
+        % addpoints(twt, subloc(cur,8), yflip+(yflip-subloc(cur,9)));
+        addpoints(twt, subloc(cur,8), subloc(cur,9));
+    end
+    if subloc(cur,13) >= 0.95
+        % addpoints(ttt, subloc(cur,11), yflip+(yflip-subloc(cur,12)));
+        addpoints(ttt, subloc(cur,11), subloc(cur,12));
+    end
+    xlim([0, vidWidth]);
+    ylim([0,vidHeight]);
+    drawnow
+    F(cur) = getframe;
+end
+writeVideo(myVideo, F);
+movie(F,1);
+close(myVideo);
+
+disp('----------------------');
+%}

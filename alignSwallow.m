@@ -16,11 +16,11 @@ for i = 1:size(pswallow,1)
         if abs(outtime - reward(1)) > iti/2
             continue
         end
-        new = [pswallow(i,1) rewardnum outtime-reward(1)];
+        new = [pswallow(i,1) rewardnum outtime-reward(1) pswallow(i,5)];
         aligned = [aligned; new];
     % if pswallow happens in the first iti/2s after the reward
     elseif lag <= iti/2 && lag > 0
-        new = [pswallow(i,1) rewardnum lag];
+        new = [pswallow(i,1) rewardnum lag pswallow(i,5)];
         aligned = [aligned; new];
     % if pswallow happens in the second iti/2s after the reward and rewardnum
     % has not been updated
@@ -31,10 +31,10 @@ for i = 1:size(pswallow,1)
         end
         if rewardnum > size(reward,1)
             rewardnum = size(reward,1);
-            new = [pswallow(i,1) rewardnum+1 lag];
+            new = [pswallow(i,1) rewardnum+1 lag pswallow(i,5)];
             aligned = [aligned; new];
         else
-            new = [pswallow(i,1) rewardnum lag];
+            new = [pswallow(i,1) rewardnum lag pswallow(i,5)];
             aligned = [aligned; new];
         end
     % if pswallow happens in the second iti/2s after the reward and rewardnum
@@ -42,10 +42,10 @@ for i = 1:size(pswallow,1)
     elseif lag < 0 && abs(lag) < iti/2
         if rewardnum > size(reward,1)
             rewardnum = size(reward,1);
-            new = [pswallow(i,1) rewardnum+1 lag];
+            new = [pswallow(i,1) rewardnum+1 lag pswallow(i,5)];
             aligned = [aligned; new];
         else
-            new = [pswallow(i,1) rewardnum lag];
+            new = [pswallow(i,1) rewardnum lag pswallow(i,5)];
             aligned = [aligned; new];
         end
     else

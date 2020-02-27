@@ -40,15 +40,16 @@ end
 
 % swallowing bout log
 if size(loc,2) > 9
-    windowsize = 25;
-    threshold = 0.25;
-    dlarydx = calcDerivative(loc(:,1),loc(:,11));
+    windowsize = 20;
+    threshold = 10;
+    hdiff = loc(:,11) - loc(:,14);
+    dhdiffdx = calcDerivative(loc(:,1),hdiff);
     swallowbout_path = strcat('Videos/',session,'/','swallowbout.csv');
     if isfile(swallowbout_path) && resetON == 0
         skinbout = readmatrix(swallowbout_path);
         disp('swallowbout.csv loaded');
     else
-        skinbout = defineSkinBout(loc,dlarydx,windowsize,threshold);
+        skinbout = defineSkinBout(loc,dhdiffdx,windowsize,threshold);
         writematrix(skinbout,swallowbout_path);
         disp('swallowbout.csv created');
     end

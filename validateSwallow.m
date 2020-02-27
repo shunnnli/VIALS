@@ -1,10 +1,10 @@
-function [emgswallow] = validateSwallow(emgenv,loc,tp,camdata)
+function [emgswallow] = validateSwallow(emg,loc,tp,camdata)
 % Find putative swallow based on EMG
 % find EMG envelope peak without tongue protrusion
 %   OUTPUT:
 %       emgswallow = [esid, time, envplocs(i), envpeaks(i), nextpeak]
 
-maxlag = 0.2;   % 200 ms
+maxlag = 0.2;   % 100 ms
 
 % lary corrected trajectory = Laryngeal - jaw
 yjaw = loc(:,14);
@@ -18,8 +18,8 @@ jawthreshold = (jawtif+jawtin)/2;
 % jawthreshold = min(alljh);
 
 % Find peaks of EMG envelope
-[envpeaks,envplocs] = findpeaks(emgenv(:,2),...
-    'MinPeakDistance',3000,'MinPeakProminence',30);
+[envpeaks,envplocs] = findpeaks(emg.env,...
+    'MinPeakDistance',4000,'MinPeakProminence',20);
 % Find peaks of laryngeal y trajectory
 [~,locs] = findpeaks(hdiff,'MinPeakDistance',15,'MinPeakProminence',5);
 
@@ -28,7 +28,7 @@ esid = 0;
 emgswallow = [];
 tpRange = tp(:,35:36);
 for i = 1:size(envplocs)
-    time = emgenv(envplocs(i),1);    % corresponding time
+    time = emg.time(envplocs(i));    % corresponding time
     frame = time2frame(time,camdata);
     maxframe = time2frame(time+maxlag,camdata);
     % find the first traj peak after EMG peak

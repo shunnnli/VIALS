@@ -1,4 +1,4 @@
-function [camdata,loc] = loadLocData(session,start,stop,rmoutliersON)
+function [camdata,loc] = loadLocData(session,start,stop)
 
 camdata = load(strcat('Videos/',session,'/times.mat'));
 
@@ -15,21 +15,21 @@ else
 end
 disp('loc.csv loaded');
 
-if rmoutliersON == 1
-    % Remove tongue outliers
-    loc = cutOutliers(loc,0.95);
-    
-    % Remove laryngeal and jaw outliers
-    if size(loc,2) > 9
-        for i = [10 11 13 14]
-            % Skip if the column is all NaN (18-102119-1)
-            if ~isnan(loc(:,i))
-                [loc,~] = removeOutliers(loc,i);
-            end
+% Remove tongue outliers
+loc = cutOutliers(loc,0.95);
+
+% Remove laryngeal and jaw outliers
+if size(loc,2) > 9
+    for i = [10 11 13 14]
+        % Skip if the column is all NaN (18-102119-1)
+        if ~isnan(loc(:,i))
+            % can choose whether the data needs to be smoothed or not
+            [loc,outliers] = removeOutliers(loc,i,1);
+            disp(outliers);
         end
     end
-    disp('Outliers removed');
 end
+disp('Outliers removed');
 
 end
 

@@ -1,7 +1,7 @@
-function bout = defineSkinBout(loc,dlarydx,windowsize,threshold)
+function bout = defineSkinBout(loc,dydx,windowsize,threshold)
 %defineSwalllowBout
 % INPUT:
-%       loc, dlarydx (y-axis), windowsize, threshold
+%       loc, dydx, windowsize, threshold
 % OUTPUT:
 %       bout = [boutstart boutend restlaryx restlaryy restjawx restjawy]
 
@@ -11,16 +11,14 @@ function bout = defineSkinBout(loc,dlarydx,windowsize,threshold)
 % Resting marker location:
 %   averaged marker location during preceeding bout interval
 
-bout = [];
-bouton = 0;
-boutstart = 0;
-boutend = 0;
+bout = []; bouton = 0; 
+boutstart = 0; boutend = 0;
 
-for i = 1:size(dlarydx,1)
-    % If potential boutend (i+windowsize) larger than dlarydx
-    if i + windowsize > size(dlarydx,1)
+for i = 1:size(dydx,1)
+    % If potential boutend (i+windowsize) larger than dydx
+    if i + windowsize > size(dydx,1)
         if bouton == 1
-            boutend = size(dlarydx,1);
+            boutend = size(dydx,1);
             % Get resting marker location
             %{
             low = bout(size(bout,1)-1,2);
@@ -38,7 +36,7 @@ for i = 1:size(dlarydx,1)
         break
     end
     
-    [sum,~] = sumabs(dlarydx(i:i+windowsize));
+    [sum,~] = sumabs(dydx(i:i+windowsize));
     diff = abs(loc(i,11)-loc(i+windowsize,11));
     % start bout if the condition is satisfied
     if sum > threshold && bouton == 0 && diff > 0.35
@@ -78,8 +76,10 @@ for i = 1:size(dlarydx,1)
         %}
         % Write bout
         % new_row = [boutstart boutend restlaryx restlaryy restjawx restjawy];
-        new_row = [boutstart boutend];
-        bout = [bout;new_row];
+        if boutend - boutstart >= 50
+            new_row = [boutstart boutend];
+            bout = [bout;new_row];
+        end
     end
 end
 

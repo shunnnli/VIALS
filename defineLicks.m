@@ -37,13 +37,9 @@ function [tp] = defineLicks(loc,camdata,threshold)
 %       ILM: any movement in between protrusion and retraction
 %       ICI: inter-contact interval = tongueOutTime - prevTongueInTime
 
-tp = [];
-tpid = 0;
-tpON = 0;
-pathLen = 0;
-mouthLocation = [];
-prevTongueOutTime = 0;
-prevTongueInTime = 0;
+tp = []; tpid = 0; tpON = 0;
+pathLen = 0; mouthLocation = [];
+prevTongueOutTime = 0; prevTongueInTime = 0;
 
 for cur = 1:size(loc,1)
     ttl = loc(cur,9);

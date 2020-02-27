@@ -2,10 +2,10 @@
 disp('----- Loading DLC and camdata files -----');
 % load session deeplabcut data
 sessions = ["11-062019-1"; "11-062119-1"; "11-062219-1"; "11-062419-1"; "11-062819-1";...
-    "12-070519-2"; "13-090419-1"; "13-090919-1";...
-    "14-091519-1"; "18-102119-1"; "18-102519-1"; "18-102519-2";...
-    "19-111119-1"; "20-200115-2"; "20-200117-1"];
-session = sessions(15);
+    "12-070519-2"; "13-090419-1"; "13-090919-1"; "14-091519-1"; "18-102119-1";...
+    "18-102519-1"; "18-102519-2"; "19-111119-1"; "20-200115-2"; "20-200117-1";...
+    "20-200121-1"; "20-200121-2"; "20-200121-3"; "21-012720-1"; "21-013020-1"];
+session = sessions(14);
 disp(session);
 
 % 0 = no swallow
@@ -15,7 +15,7 @@ disp(session);
 
 dlc.bottom = 0;
 dlc.side = 1;
-dlc.swallow = 4;
+dlc.swallow = 1;
 [camdata,sideloc,bottomloc,swallowloc] = loadDLC(session,dlc);
 
 %% Set camera calibration parameters

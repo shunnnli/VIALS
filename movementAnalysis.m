@@ -1,42 +1,43 @@
 %% Load loc and EMG data
 disp('----- Load loc and EMG data -----');
 
-sessions = ["11-062419-1"; "11-062819-1"; "12-070519-2"; "13-090919-1";...
-    "14-091519-1"; "18-102119-1"; "18-102519-1"; "18-102519-2";...
-    "19-111119-1"; "20-200115-2"; "20-200117-1"];
-session = sessions(9);
+sessions = ["11-062019-1"; "11-062119-1"; "11-062219-1"; "11-062419-1"; "11-062819-1";...
+    "12-070519-2"; "13-090419-1"; "13-090919-1"; "14-091519-1"; "18-102119-1";...
+    "18-102519-1"; "18-102519-2"; "19-111119-1"; "20-200115-2"; "20-200117-1";...
+    "20-200121-1"; "20-200121-2"; "20-200121-3"; "21-012720-1"; "21-013020-1"];
+session = sessions(19);
 disp(session);
 
 % Enter analysis window (in seconds)
 start = 0;
-stop = 120;
+stop = Inf;
 
 % Enter bandpass frequency
 % Based on Lever et al. (2009) 
 
 % https://link.springer.com/article/10.1007/s00455-009-9232-1
-bplow = 100;
-bphigh = 3000;
+% bplow = 100;
+% bphigh = 3000;
 
 % Load single session data
-[camdata,loc] = loadLocData(session,start,stop,0);
-[tp,tpbout,lickbout,skinbout] = loadLocAnalysis(session,loc,camdata,0);
-[emg,emgenv] = loadEMG(bplow,bphigh,start,stop,camdata);
+[camdata,loc] = loadLocData(session,start,stop);
+[tp,tpbout,lickbout,skinbout] = loadLocAnalysis(session,loc,camdata,1);
+emg = loadEMG(start,stop,camdata);
 breathing = loadBreathing(start,stop,camdata);
 
 % Reset tp.csv for multiple sessions
 % for i = 1:size(sessions,1)
-%     [camdata,loc] = loadLocData(sessions(i),start,stop,1);
+%     [camdata,loc] = loadLocData(sessions(i),start,stop);
 %     [tp,tpbout,lickbout,swallowbout] = loadLocAnalysis(sessions(i),loc,camdata,1);
 %     % [emg,emgenv] = loadEMG(bplow,bphigh,start,stop,camdata);
 % end
 
-%% Swallowing identification
+% Swallowing identification
 disp('----- Swallowing identification -----');
 
 % Marker height diff = Laryngeal - jaw
 hdiff = loc(:,11) - loc(:,14);
-% disp('hdiff[] generated');
+disp('hdiff[] generated');
 
 % Accelaration of vertical jaw and hdiff
 velyjaw = [0; calcDerivative(frame2time(loc(:,1),camdata),loc(:,14))];
@@ -47,7 +48,7 @@ acchdiff = [0; calcDerivative(frame2time(loc(:,1),camdata),velhdiff)];
 % Find putative swallow
 % pswallow = [];
 [pswallow,inthres,allpeaks] = defineSwallows(loc,tp,camdata);
-% disp('Putative swallow found');
+% save('allpeaks'); disp('allpeaks saved');
 
 % Further filtering of putative swallow
 % 2. if laryngeal does not move
@@ -58,7 +59,7 @@ acchdiff = [0; calcDerivative(frame2time(loc(:,1),camdata),velhdiff)];
 
 % Validate pswallow using EMG data
 % emgswallow = [];
-emgswallow = validateSwallow(emgenv,loc,tp,camdata);
+emgswallow = validateSwallow(emg,loc,tp,camdata);
 % disp('EMG swallow found');
 
 %% Raster plot
@@ -67,30 +68,26 @@ disp('----- Raster plot of event summary -----');
 % Raster plot
 % tp(any(isnan(tp(:,3)),2),:) = [];
 [rp,aligned] = plotRaster(tp,pswallow,emgswallow,camdata);
+% colormap(jet); colorbar
 rp_path = strcat('Videos/',session,'/','rp.svg');
 legend
 
 %% Swallowing bout visualized
 disp('----- Visualization of swallowing bout -----');
 
-% Trajectory plot
-%{
-19-111119-1;
-only es: 5x, 17x, 24, 25, 25, 27, 28, 33, 33, 35, 39, 40, 41
-only vs: 110-112s
-%}
-
 % Input time
-rewardid = 20;
-rdiff = -1;
-t = camdata.reward(rewardid,1) + rdiff - 1;
-% t = 15;
+% rewardid = 1; rdiff = -1;
+% t = camdata.reward(rewardid,1) + rdiff - 1;
+t = 5;
 floor = time2frame(t,camdata);
 ceiling = floor + 1000;
 time = frame2time(floor:ceiling,camdata);
 
+% Swallowing + breathing
 % hdiff
-pks = find(pswallow(:,2) >= time(1) & pswallow(:,2) <= time(size(time,1)));
+% pks = find(pswallow(:,2) >= time(1) & pswallow(:,2) <= time(size(time,1)));
+sliswallow = find(allpeaks.sli(:,1) >= 0);
+pks = find(allpeaks.locs(sliswallow) >= floor & allpeaks.locs(sliswallow) <= ceiling);
 % lici = find(longici(:,3) >= floor & longici(:,4) <= ceiling);
 
 figure
@@ -105,38 +102,82 @@ hold on
 hold on
 plot(frame2time(loc(:,1),camdata),hdiff);
 hold on
-plot(pswallow(:,2),pswallow(:,3),'or');
+% scatter(frame2time(allpeaks.locs(sliswallow),camdata),allpeaks.pks(sliswallow),...
+%     36,allpeaks.sli(sliswallow,1),'o','LineWidth',1);
+% scatter(frame2time(allpeaks.locs,camdata),allpeaks.pks,36,...
+%     allpeaks.sli(:,1),'o','LineWidth',1);
+% colormap(flipud(hot)); colorbar
+
+scatter(frame2time(allpeaks.locs(sliswallow),camdata),allpeaks.pks(sliswallow),'or','LineWidth',1);
 hold on
 plotConditionalTraj('traj',frame2time(loc(:,1),camdata),hdiff,tp);
 xlabel('Time (s)')
 ylabel('Marker height difference (a.u.)')
 xlim([time(1) time(length(time))]);
 
-% Breathing
 subplot(4,1,2)
 plot(breathing.raw(:,1),breathing.trace);
 hold on
 for i = 1:size(pks,1)
-    xline(pswallow(pks(i),2),'-r');
+    xline(frame2time(allpeaks.locs(sliswallow(pks(i))),camdata),'-r');
 end
+ylabel('Breathing (a.u.)')
 xlim([time(1) time(length(time))]);
 
 subplot(4,1,3)
 plot(breathing.raw(:,1),breathing.phase);
 hold on
 for i = 1:size(pks,1)
-    xline(pswallow(pks(i),2),'-r');
+    xline(frame2time(allpeaks.locs(sliswallow(pks(i))),camdata),'-r');
 end
+% scatter(breathing.raw(breathing.count,1),breathing.phase(breathing.count),'or');
+ylabel('Breathing phase')
+xlim([time(1) time(length(time))]);
+
+subplot(4,1,4)
+plot(breathing.raw(:,1),breathing.frequency);
+hold on
+for i = 1:size(pks,1)
+    xline(frame2time(allpeaks.locs(sliswallow(pks(i))),camdata),'-r');
+end
+ylabel('Breathing frequency (Hz)')
+xlim([time(1) time(length(time))]);
+
+%% EMG + swallowing
+% Input time
+% rewardid = 1; rdiff = -1;
+% t = camdata.reward(rewardid,1) + rdiff - 1;
+t = 55;
+floor = time2frame(t,camdata);
+ceiling = floor + 1000;
+time = frame2time(floor:ceiling,camdata);
+
+% hdiff
+pks = find(pswallow(:,2) >= time(1) & pswallow(:,2) <= time(size(time,1)));
+% lici = find(longici(:,3) >= floor & longici(:,4) <= ceiling);
+
+figure
+subplot(2,1,1)
+hold on
+plot(frame2time(loc(:,1),camdata),hdiff);
+hold on
+% scatter(frame2time(allpeaks.locs,camdata),allpeaks.pks,36,...
+%     allpeaks.sli(:,1),'o','LineWidth',1);
+% colormap(jet); colorbar;
+scatter(pswallow(:,2),pswallow(:,3),36,'or','LineWidth',1);
+hold on
+plotConditionalTraj('traj',frame2time(loc(:,1),camdata),hdiff,tp);
+xlabel('Time (s)')
+ylabel('Marker height difference (a.u.)')
 xlim([time(1) time(length(time))]);
 
 % hdiff + EMG
 % Find peaks of EMG envelope
-[envpeaks,envplocs] = findpeaks(emgenv(:,2),...
-    'MinPeakDistance',3000,'MinPeakProminence',20);
-subplot(4,1,4)
-plot(emg(:,1),emg(:,2),'Color','#4DBEEE');
+[envpeaks,envplocs] = findpeaks(emg.env,'MinPeakDistance',4000,'MinPeakProminence',20);
+subplot(2,1,2)
+plot(emg.time,emg.trace,'Color','#4DBEEE');
 hold on
-plot(emgenv(:,1),emgenv(:,2),'LineWidth',1);
+plot(emg.time,emg.env,'LineWidth',1);
 for i = 1:size(pks,1)
     xline(pswallow(pks(i),2),'-r');
 end
@@ -155,33 +196,99 @@ hold on
 % plotConditionalTraj('emg',frame2time(loc(:,1),camdata),emgenv,tp);
 hold on
 %}
-plot(emgenv(envplocs,1),envpeaks,'oc');
+plot(emg.time(envplocs),envpeaks,'oc');
 hold on
-plot(emgenv(emgswallow(:,3),1),emgswallow(:,4),'ob');
+plot(emg.time(emgswallow(:,3)),emgswallow(:,4),'ob');
 xlabel('Time (s)')
 ylabel('EMG amplitude (a.u.)')
-xlim([time(1) time(length(time))]);
+xlim([time(1) time(length(time))]); ylim([0 max(emg.trace)]);
 
 %% Breathing and swallowing
 swins = 0;
-sb = [];
-for i = 1:size(pswallow,1)
-    [~,index] = findClosest(breathing.raw(:,1),pswallow(i,2));
-    % if pswallow happens during in inspiration (dbreathing < -500)
+% psb = [];
+% for i = 1:size(pswallow,1)
+%     [~,index] = findClosest(breathing.raw(:,1),pswallow(i,2));
+%     % if swallow happens during in inspiration (dbreathing < -500)
+%     if breathing.d(index) <= -500
+%         swins = swins + 1;
+%     end
+%     psb = [psb; pswallow(i,1) pswallow(i,2),...
+%         breathing.trace(index) breathing.phase(index) breathing.d(index)];
+% end
+
+slib20 = [];
+sliswallow = find(allpeaks.sli(:,1) >= 10);
+for i = 1:size(sliswallow,1)
+    [~,index] = findClosest(breathing.raw(:,1),frame2time(allpeaks.locs(sliswallow(i)),camdata));
+    % if swallow happens during in inspiration (dbreathing < -500)
     if breathing.d(index) <= -500
         swins = swins + 1;
     end
-    sb = [sb; pswallow(i,1) pswallow(i,2),...
+    slib20 = [slib20; sliswallow(i),frame2time(allpeaks.locs(sliswallow(i)),camdata),...
         breathing.trace(index) breathing.phase(index) breathing.d(index)];
 end
 
+totalslib20 = [slib14;slib15;slib16];
+totalslib21 = [slib19;slib20];
+totalslib = [totalslib20;totalslib21];
+
+figure
+% p = polarscatter(slib(:,4)+pi,abs(allpeaks.pks(sliswallow)),36,allpeaks.sli(sliswallow));
+% p = polarscatter(psb(:,4),abs(allpeaks.pks(pswallow(:,1))));
+% colormap(flipud(hot)); colorbar; rlim([0 20]);
+
+p = polarhistogram(totalslib(:,4)+pi,30);
+% p.DisplayStyle = 'stairs'; 
+% hold on
+% a1 = polarhistogram(totalslib20(:,4)+pi,30);
+% a1.DisplayStyle = 'stairs'; 
+% hold on
+% a2 = polarhistogram(totalslib21(:,4)+pi,30);
+% a2.DisplayStyle = 'stairs'; 
+% p = polarhistogram(psb(:,4)+pi,30);
+p.DisplayStyle = 'stairs'; 
+
+p = gca; 
+p.ThetaAxisUnits = 'radians'; 
+p.ThetaTick = [0 0.5*pi pi 1.5*pi];
+p.ThetaTickLabel = {'0 / 2\pi','0.5\pi','\pi','1.5\pi'};
+
+figure
+histogram(totalslib(:,4)+pi,30);
+xlim([0 2*pi]);
+
+xlabel('Phase')
+
+%% Breathing rate during baseline vs drinking
+drinkbf = [];
+restbf = [];
+for i = 1:size(skinbout,1)
+    [~,bstartindex] = findClosest(breathing.raw(:,1),frame2time(skinbout(i,1),camdata));
+    [~,bendindex] = findClosest(breathing.raw(:,1),frame2time(skinbout(i,2),camdata));
+    drinkbf = [drinkbf; mean(breathing.frequency(bstartindex:bendindex))];
+    
+    if i - 1 > 0
+        [~,rstartindex] = findClosest(breathing.raw(:,1),frame2time(skinbout(i-1,2),camdata));
+        rendindex = bstartindex -1;
+        
+        restbf = [restbf; mean(breathing.frequency(rstartindex:rendindex))];
+    end
+end
+
+prepostbf14 = [];
+for i = 2:size(restbf,1)
+    prepostbf14 = [prepostbf14; restbf(i-1) drinkbf(i) restbf(i)];
+end
+
 %%
+total = [prepostbf14;prepostbf16;prepostbf19;prepostbf20];
+[p,tbl,stats] = anova1(total);
+
 figure
-histogram(sb(:,3));
-figure
-histogram(sb(:,4));
-figure 
-histogram(sb(:,5));
+y = [nanmean((nanmean(total(:,1))+nanmean(total(:,3)))/2) nanmean(total(:,2)); ...
+    nanmean(total(:,1)) nanmean(total(:,2)); ...
+    nanmean(total(:,3)) nanmean(total(:,2))];
+bar(y);
 
 
 %% Quantify swallow and licking movement
@@ -209,7 +316,7 @@ for thres = -0.5:0.005:0.5
             numerator = numerator + 1;
         end
     end
-    percentage = [percentage; thres, numerator / size(pswallow,1)];
+    percentage = [percentage; thres, numerator/size(pswallow,1)];
 end
 figure
 plot(percentage(:,1),percentage(:,2));
@@ -289,107 +396,6 @@ tpid = 276;
 
 % figure
 plotTongueTraj(phase,tpid,session,0,1);
-
-%% Swallowing marker trajectories
-% --------------------- Laryngeal complex trajectory ---------------------
-%{
-figure
-subplot(4,1,1)
-title('time vs x');
-% plotBouts('swallowbout',swallowbout,floor,ceiling);
-hold on 
-plot(frame2time(loc(floor:ceiling,1),camdata),loc(floor:ceiling,10));
-hold on
-plot(frame2time(loc(floor:ceiling,1),camdata),loc(floor:ceiling,13)-5.2);
-
-subplot(4,1,2)
-title('time vs y');
-% plotBouts('swallowbout',swallowbout,floor,ceiling);
-hold on
-plot(frame2time(loc(floor:ceiling,1),camdata),loc(floor:ceiling,11));
-hold on
-plot(frame2time(loc(floor:ceiling,1),camdata),loc(floor:ceiling,14));
-
-subplot(4,1,3)
-title('combined laryngeal');
-% plotBouts('swallowbout',swallowbout,floor,ceiling);
-hold on
-plot(frame2time(loc(floor:ceiling,1),camdata),loc(floor:ceiling,10));
-hold on 
-plot(frame2time(loc(floor:ceiling,1),camdata),loc(floor:ceiling,11));
-
-subplot(4,1,4)
-title('combined jaw');
-% plotBouts('swallowbout',swallowbout,floor,ceiling);
-hold on
-plot(frame2time(loc(floor:ceiling,1),camdata),loc(floor:ceiling,13));
-hold on 
-plot(frame2time(loc(floor:ceiling,1),camdata),loc(floor:ceiling,14));
-%}
-
-% --------------- Laryngeal + tongue trajectory ---------------------
-%{
-figure
-plotBouts('swallowbout',swallowbout,floor,ceiling);
-hold on
-drawx = 1;
-% plot(loc(floor:ceiling,1),loc(floor:ceiling,10),'DisplayName','Laryngeal x');
-hold on 
-plot(loc(floor:ceiling,1),loc(floor:ceiling,11),'DisplayName','Laryngeal y');
-hold on 
-% plot(loc(floor:ceiling,1),loc(floor:ceiling,6),'DisplayName','Tongue x');
-hold on 
-% plot(loc(floor:ceiling,1),loc(floor:ceiling,7),'DisplayName','Tongue y');
-hold on
-% plot(loc(floor:ceiling,1),loc(floor:ceiling,13),'DisplayName','Jaw x');
-hold on
-% plot(loc(floor:ceiling,1),loc(floor:ceiling,14),'DisplayName','Jaw y');
-hold on 
-plotConditionalTraj('tp',loc(:,1),loc(:,11),tp,floor,ceiling);
-%}
-
-%% Plot marker trajectory (video)
-%{
-traj = figure('Name','Trajectory');
-ljt = animatedline('Color', 'b');           % lowerJaw trajectory
-spt = animatedline('Color', 'g');           % spout trajectory
-twt = animatedline('Color', '#EDB120');     % trident whisker trajectory
-ttt = animatedline('Color', 'r');           % tongueTip trajectory
-yflip = 650;
-
-vid_path = strcat('Videos/',session,'/','trajactories.avi');
-myVideo = VideoWriter(vid_path,'Uncompressed AVI');
-open(myVideo);
-
-for cur = 1:size(subloc,1)
-    hold on
-    if subloc(cur,4) >= 0.95
-        % addpoints(ljt, subloc(cur,2), yflip+(yflip-subloc(cur,3)));
-        addpoints(ljt, subloc(cur,2), subloc(cur,3));
-    end
-    if subloc(cur,7) >= 0.95
-        % addpoints(spt, subloc(cur,5), yflip+(yflip-subloc(cur,6)));
-        addpoints(spt, subloc(cur,5), subloc(cur,6));
-    end
-    if subloc(cur,10) >= 0.95
-        % addpoints(twt, subloc(cur,8), yflip+(yflip-subloc(cur,9)));
-        addpoints(twt, subloc(cur,8), subloc(cur,9));
-    end
-    if subloc(cur,13) >= 0.95
-        % addpoints(ttt, subloc(cur,11), yflip+(yflip-subloc(cur,12)));
-        addpoints(ttt, subloc(cur,11), subloc(cur,12));
-    end
-    xlim([0, vidWidth]);
-    ylim([0,vidHeight]);
-    drawnow
-    F(cur) = getframe;
-end
-writeVideo(myVideo, F);
-movie(F,1);
-close(myVideo);
-
-disp('----------------------');
-%}
 
 %% Subclassify tp data
 %{
@@ -495,112 +501,6 @@ plotConditionalTraj('tp',loc(:,1),hdiff,tp,floor,ceiling);
 % plotILI(bid,lickbout,tp,'frame');
 
 disp('----------------------');
-%% DFT swallowing bout analysis
-%{
-% t = 0:0.006:10-0.0006; % Time vector
-% x = sin(2*pi*15*t) + sin(2*pi*40*t);      % Signal
-
-xaxis = loc(swallowbout(1,1):swallowbout(1,2),10);
-yaxis = loc(swallowbout(1,1):swallowbout(1,2),11);
-x = fft(xaxis);
-y = fft(yaxis);
-
-% x axis 
-magnitude = abs(x);            
-x(magnitude < 1e-6) = 0;
-phase = unwrap(angle(x));
-f = (0:length(x)-1)/(length(x) * 0.006); % Frequency vector
-
-figure
-subplot(3,1,1)
-plot(xaxis)
-title('Trace x')
-subplot(3,1,2)
-plot(f(2:length(x)/2),magnitude(2:length(x)/2));
-title('Magnitude x')
-subplot(3,1,3)
-plot(f,phase*180/pi)
-title('Phase x')
-
-% y axis
-magnitude = abs(y);            
-y(magnitude < 1e-6) = 0;
-phase = unwrap(angle(y));
-f = (0:length(y)-1)/(length(y) * 0.006); % Frequency vector
-
-figure
-subplot(3,1,1)
-plot(yaxis)
-title('Trace y')
-subplot(3,1,2)
-plot(f(2:length(y)/2),magnitude(2:length(y)/2));
-title('Magnitude y')
-subplot(3,1,3)
-plot(f,phase*180/pi)
-title('Phase y')
-%}
-
-disp('----------------------');
-
-%% Marker 3D trajectory along time
-threshold = [10 90];
-% jaw
-xjaw = loc(floor:ceiling,13); 
-yjaw = loc(floor:ceiling,14);
-xjawol = isoutlier(xjaw,'percentiles',threshold); 
-yjawol = isoutlier(yjaw,'percentiles',threshold);
-figure
-for i = 1:size(xjaw,1)
-    hold on
-    if xjawol(i) == 1 && yjawol(i) == 0
-        scatter(xjaw(i),yjaw(i),'oc');
-    elseif yjawol(i) == 1 && xjawol(i) == 0
-        scatter(xjaw(i),yjaw(i),'og');
-    elseif yjawol(i) == 1 && xjawol(i) == 1
-        scatter(xjaw(i),yjaw(i),'ob');
-    else
-        scatter(xjaw(i),yjaw(i),'or');
-    end
-end
-% scatter(loc(floor:ceiling,13),loc(floor:ceiling,14));
-
-% laryngeal
-xlary = loc(floor:ceiling,10); 
-ylary = loc(floor:ceiling,11);
-xlaryol = isoutlier(xlary,'percentiles',threshold); 
-ylaryol = isoutlier(ylary,'percentiles',threshold);
-figure
-for i = 1:size(xlary,1)
-    hold on
-    if xlaryol(i) == 1 && ylaryol(i) == 0
-        scatter(xlary(i),ylary(i),'oc');
-    elseif ylaryol(i) == 1 && xlaryol(i) == 0
-        scatter(xlary(i),ylary(i),'og');
-    elseif ylaryol(i) == 1 && xlaryol(i) == 1
-        scatter(xlary(i),ylary(i),'ob');
-    else
-        scatter(xlary(i),ylary(i),'or');
-    end
-end
-% scatter(loc(floor:ceiling,10),loc(floor:ceiling,11));
-
-%% Test
-total2 = [];
-sid(1:size(tp,1),1) = 2;
-total = [total1; sid tp(:,[1 5 6:11 15:20])];
-
-%% Session notes
-%{
-"11-062419-1"
-"11-062819-1"
-"12-070519-2"
-"13-090919-1"
-"14-091519-1"
-"18-102119-1"
-"18-102519-1"
-"18-102519-2"
-"19-111119-1"
-%}
 
 %% Lick vs no lick
 % barplot = [];
@@ -662,16 +562,21 @@ if size(loc,2) > 9
 end
 disp('Outliers removed');
 
-%% Test
-floor = time2frame(11.5,camdata);
+%% Trace
+
+floor = time2frame(30,camdata);
 ceiling = floor + 1000;
 time = frame2time(floor:ceiling,camdata);
+pks = find(pswallow(:,2) >= time(1) & pswallow(:,2) <= time(size(time,1)));
 
 figure
-subplot(3,1,1)
+subplot(4,2,[1 2])
 plot(frame2time(loc(:,1),camdata),hdiff);
 hold on
-plot(pswallow(:,2),pswallow(:,3),'or');
+scatter(frame2time(allpeaks.locs,camdata),allpeaks.pks,36,...
+    allpeaks.sli(:,1),'o','LineWidth',1);
+colormap(jet); colorbar;
+% scatter(pswallow(:,2),pswallow(:,3),36,'or','LineWidth',1);
 hold on
 plotConditionalTraj('traj',frame2time(loc(:,1),camdata),hdiff,tp);
 xlim([time(1) time(length(time))]);
@@ -679,13 +584,228 @@ xlabel('Time (s)')
 ylabel('Marker height difference (a.u.)')
 
 % figure
-subplot(3,1,2)
+subplot(4,2,3)
 plot(frame2time(loc(:,1),camdata),loc(:,11));   % ylary
+hold on
+plotConditionalTraj('traj',frame2time(loc(:,1),camdata),loc(:,11),tp);
+hold on
+for i = 1:size(pks,1)
+    xline(pswallow(pks(i),2),'-r');
+end
 xlabel('Time (s)')
 ylabel('Larynx marker height (a.u.)')
 xlim([time(1) time(length(time))]);
-subplot(3,1,3)
+
+subplot(4,2,4)
 plot(frame2time(loc(:,1),camdata),loc(:,14));   % yjaw
+hold on
+plotConditionalTraj('traj',frame2time(loc(:,1),camdata),loc(:,14),tp);
+hold on
+for i = 1:size(pks,1)
+    xline(pswallow(pks(i),2),'-r');
+end
 xlabel('Time (s)')
 ylabel('Jaw marker height (a.u.)')
 xlim([time(1) time(length(time))]);
+
+subplot(4,2,5)
+plot(frame2time(loc(:,1),camdata),loc(:,10)); % xlary
+hold on
+for i = 1:size(pks,1)
+    xline(pswallow(pks(i),2),'-r');
+end
+xlabel('Time (s)')
+ylabel('xLary (a.u.)')
+xlim([time(1) time(length(time))]);
+
+subplot(4,2,6)
+plot(frame2time(loc(:,1),camdata),loc(:,13)); % xjaw
+hold on
+for i = 1:size(pks,1)
+    xline(pswallow(pks(i),2),'-r');
+end
+xlabel('Time (s)')
+ylabel('xjaw (a.u.)')
+xlim([time(1) time(length(time))]);
+
+% subplot(4,2,5)
+% plot(frame2time(loc(:,1),camdata),smoothdata(velhdiff));   % velhdiff
+% hold on
+% for i = 1:size(pks,1)
+%     xline(pswallow(pks(i),2),'-r');
+% end
+% xlabel('Time (s)')
+% ylabel('Velocity of hdiff (a.u.)')
+% xlim([time(1) time(length(time))]);
+% 
+% subplot(4,2,6)
+% plot(frame2time(loc(:,1),camdata),smoothdata(velyjaw));   % velyjaw
+% hold on
+% for i = 1:size(pks,1)
+%     xline(pswallow(pks(i),2),'-r');
+% end
+% xlabel('Time (s)')
+% ylabel('Velocity of yjaw (a.u.)')
+% xlim([time(1) time(length(time))]);
+
+subplot(4,2,7)
+plot(frame2time(loc(:,1),camdata),smoothdata(acchdiff));   % acchdiff
+hold on
+for i = 1:size(pks,1)
+    xline(pswallow(pks(i),2),'-r');
+end
+xlabel('Time (s)')
+ylabel('Accelaration of hdiff (a.u.)')
+xlim([time(1) time(length(time))]);
+
+subplot(4,2,8)
+plot(frame2time(loc(:,1),camdata),smoothdata(accyjaw));   % accyjaw
+hold on
+for i = 1:size(pks,1)
+    xline(pswallow(pks(i),2),'-r');
+end
+xlabel('Time (s)')
+ylabel('Accelaration of yjaw (a.u.)')
+xlim([time(1) time(length(time))]);
+
+%% pswallow distribution
+
+[pswallow,inthres,allpeaks] = defineSwallows(loc,tp,camdata);
+
+figure
+for i = 1:size(allpeaks.sli)
+    hold on
+    if allpeaks.sli(i,2) == 0
+        scatter(allpeaks.sli(i,1),allpeaks.locs(i),'ok');
+    elseif allpeaks.sli(i,2) == 1
+        scatter(allpeaks.sli(i,1),allpeaks.locs(i),'ob');
+    else
+        scatter(allpeaks.sli(i,1),allpeaks.locs(i),'or');
+    end
+end
+xlabel('Swallow likelihood index');
+
+figure
+for i = 1:size(allpeaks.sli)
+    hold on
+    if allpeaks.sli(i,2) == 0
+        scatter(allpeaks.sli(i,1),loc(allpeaks.locs(i),11),'ok');
+    elseif allpeaks.sli(i,2) == 1
+        scatter(allpeaks.sli(i,1),loc(allpeaks.locs(i),11),'ob');
+    else
+        scatter(allpeaks.sli(i,1),loc(allpeaks.locs(i),11),'or');
+    end
+end
+xlabel('Swallow likelihood index');
+ylabel('Height of larynx marker (a.u.)');
+
+figure
+for i = 1:size(allpeaks.sli)
+    hold on
+    if allpeaks.sli(i,2) == 0
+        scatter(allpeaks.sli(i,1),loc(allpeaks.locs(i),14),'ok');
+    elseif allpeaks.sli(i,2) == 1
+        scatter(allpeaks.sli(i,1),loc(allpeaks.locs(i),14),'ob');
+    else
+        scatter(allpeaks.sli(i,1),loc(allpeaks.locs(i),14),'or');
+    end
+end
+xlabel('Swallow likelihood index');
+ylabel('Height of jaw marker (a.u.)');
+
+figure
+for i = 1:size(allpeaks.sli)
+    hold on
+    if allpeaks.sli(i,2) == 0
+        scatter(allpeaks.sli(i,1),hdiff(allpeaks.locs(i)),'ok');
+    elseif allpeaks.sli(i,2) == 1
+        scatter(allpeaks.sli(i,1),hdiff(allpeaks.locs(i)),'ob');
+    else
+        scatter(allpeaks.sli(i,1),hdiff(allpeaks.locs(i)),'or');
+    end
+end
+xlabel('Swallow likelihood index');
+ylabel('Marker height difference (a.u.)');
+
+%% Test
+floor = time2frame(5.8,camdata);
+ceiling = floor + 680;
+time = frame2time(floor:ceiling,camdata);
+pks = find(pswallow(:,2) >= time(1) & pswallow(:,2) <= time(size(time,1)));
+
+figure
+subplot(2,1,1)
+plot(frame2time(loc(:,1),camdata),hdiff);
+hold on
+plotConditionalTraj('traj',frame2time(loc(:,1),camdata),hdiff,tp);
+hold on
+% scatter(frame2time(allpeaks.locs,camdata),allpeaks.pks,36,...
+%     allpeaks.sli(:,1),'o','LineWidth',1);
+% colormap(jet); colorbar;
+scatter(pswallow(:,2),pswallow(:,3),36,'or','LineWidth',1);
+xlabel('Time (s)')
+ylabel('Larynx marker height (a.u.)')
+xlim([time(1) time(length(time))]);
+
+subplot(2,1,2)
+plot(frame2time(loc(:,1),camdata),hdiff);
+hold on
+plotConditionalTraj('traj',frame2time(loc(:,1),camdata),hdiff,tp);
+hold on
+scatter(frame2time(allpeaks.locs,camdata),allpeaks.pks,36,...
+    allpeaks.sli(:,1),'o','LineWidth',1);
+colormap(jet); colorbar;
+% scatter(pswallow(:,2),pswallow(:,3),36,'or','LineWidth',1);
+xlabel('Time (s)')
+ylabel('Larynx marker height (a.u.)')
+xlim([time(1) time(length(time))]);
+
+% subplot(2,1,2)
+% plot(frame2time(loc(:,1),camdata),loc(:,14));
+% hold on
+% plotConditionalTraj('traj',frame2time(loc(:,1),camdata),loc(:,14),tp);
+% hold on
+% % scatter(frame2time(allpeaks.locs,camdata),loc(allpeaks.locs,14),36,...
+% %     allpeaks.sli(:,1),'o','LineWidth',1);
+% % colormap(jet); colorbar;
+% scatter(pswallow(:,2),loc(time2frame(pswallow(:,2),camdata),14),36,'or','LineWidth',1);
+% % yline(inthres);
+% xlabel('Time (s)')
+% ylabel('Larynx marker height (a.u.)')
+% xlim([time(1) time(length(time))]);
+
+%% Make movie
+close all
+N = 550;    % Number of frames
+floor = time2frame(0.5,camdata); ceiling = floor + N;
+
+time = frame2time(floor:ceiling,camdata);
+alltime = frame2time(loc(:,1),camdata);
+pks = find(pswallow(:,2) >= time(1) & pswallow(:,2) <= time(size(time,1)));
+a1 = animatedline('Color','#0072BD');
+a2 = animatedline('Color','k');
+
+for i = floor:ceiling
+    addpoints(a1,frame2time(loc(i,1),camdata),hdiff(i));
+%     addpoints(a2,alltime(tp(i,35):tp(i,36)),hdiff(tp(i,35):tp(i,36)));
+    drawnow
+    
+    xlabel('Time (s)')
+    ylabel('Larynx marker height (a.u.)')
+    xlim([time(1) time(length(time))]); ylim([-30 30]);
+
+    % Store the frame
+    M(i) = getframe(gcf); % leaving gcf out crops the frame in the movie
+end
+% movie(M);
+
+%% Remove outlier test
+ol = find(isoutlier(loc(:,11)) == 1);
+
+plot(loc(:,1),loc(:,11));
+hold on
+scatter(loc(ol,1),loc(ol,11));
+xlabel('Time (s)')
+ylabel('Larynx marker height (a.u.)')
+xlim([5000 6000]);
+

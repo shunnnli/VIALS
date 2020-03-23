@@ -118,19 +118,19 @@ for cur = 1:size(loc,1)
         spoutraw = [];
         spoutwindow = 1000;
         if tongueOutFrame - spoutwindow/2 < 1
-            for i = 1:tongueOutFrame + spoutwindow
+            for i = 1:min(tongueOutFrame+spoutwindow, size(loc,1))
                 if loc(i,5) >= threshold
                     spoutraw = [spoutraw;loc(i,2),loc(i,3),loc(i,4)];
                 end
             end
         elseif tongueOutFrame + spoutwindow/2 > size(loc,1)
-            for i = tongueOutFrame - spoutwindow : size(loc,1)
+            for i = max(1,tongueOutFrame - spoutwindow) : size(loc,1)
                 if loc(i,5) >= threshold
                     spoutraw = [spoutraw;loc(i,2),loc(i,3),loc(i,4)];
                 end
             end
         else
-            for i = tongueOutFrame-spoutwindow/2 : tongueOutFrame+spoutwindow/2
+            for i = max(1,tongueOutFrame-spoutwindow/2) : min(tongueOutFrame+spoutwindow/2, size(loc,1))
                 if loc(i,5) >= threshold
                     spoutraw = [spoutraw;loc(i,2),loc(i,3),loc(i,4)];
                 end

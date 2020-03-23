@@ -9,12 +9,12 @@ function [] = plotConditionalTraj(ytype,xaxis,yaxis,condArr)
 for i = 1:size(condArr,1)
     if strcmp('traj',ytype)
         plot(xaxis(condArr(i,35):condArr(i,36)),...
-            yaxis(condArr(i,35):condArr(i,36)),'Color', 'k');
+            yaxis(condArr(i,35):condArr(i,36)),'-k','LineWidth',1);
     elseif strcmp('emg',ytype)
         tptime = xaxis(condArr(i,35):condArr(i,36));
         [~,index] = findClosest(yaxis(:,1),tptime);
         plot(xaxis(condArr(i,35):condArr(i,36)),...
-                yaxis(index),'Color', 'k');
+                yaxis(index),'-k','LineWidth',1);
     else
         disp('Incorrect ytype value');
     end

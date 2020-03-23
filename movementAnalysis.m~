@@ -211,7 +211,7 @@ hold on
 % plot(emg.time(emgswallow(:,3)),emgswallow(:,4),'ob');
 xlabel('Time (s)')
 ylabel('EMG amplitude (a.u.)')
-xlim([time(1) time(length(time))]); ylim([-max(emg.env) max(emg.env)]);
+xlim([time(1) time(length(time))]); ylim([min(emg.e) max(emg.env)]);
 
 %% Breathing and swallowing
 swins = 0;

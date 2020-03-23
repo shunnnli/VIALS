@@ -24,12 +24,10 @@ if size(loc,2) > 9
         % Skip if the column is all NaN (18-102119-1)
         if ~isnan(loc(:,i))
             % can choose whether the data needs to be smoothed or not
-            [loc,outliers] = removeOutliers(loc,i,1);
-            disp(outliers);
+            % [loc,outliers] = removeOutliers(loc,i,0);
         end
     end
 end
-disp('Outliers removed');
 
 end
 

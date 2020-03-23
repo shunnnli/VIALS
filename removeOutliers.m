@@ -31,6 +31,7 @@ end
 
 % Fourth step: remove and fill in remaining outliers
 col = filloutliers(col,'linear','OutlierLocations',ol);
+% disp(strcat('Total outliers removed:',num2str(F1+F2)));
 
 % Fifth step: combine analyzed column to loc
 if smoothON == 1
@@ -43,6 +44,7 @@ end
 % Stored removed outliers
 outliers.salient = col;
 outliers.subtle = ol;
+disp(outliers);
 
 end
 

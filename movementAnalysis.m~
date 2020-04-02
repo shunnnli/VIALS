@@ -6,9 +6,9 @@ sessions = ["11-062019-1"; "11-062119-1"; "11-062219-1"; "11-062419-1"; "11-0628
     "18-102519-1"; "18-102519-2"; "19-111119-1"; "20-200115-2"; "20-200117-1";...
     "20-200121-1"; "20-200121-2"; "20-200121-3"; "21-012720-1"; "21-013020-1"];
 swallow3303 = ["22-0228-1"; "22-0301-1"; "23-0305-1"];
-swallowemg = ["19-111119-1"; "23-0314-1"; "23-0314-2"];
+swallowemg = ["19-111119-1"; "23-0314-1"; "23-0314-2"; "23-0315-1"];
 
-session = swallowemg(3);
+session = swallowemg(4);
 disp(session);
 
 % Enter analysis window (in seconds)
@@ -75,7 +75,7 @@ disp('----- Raster plot of event summary -----');
 rp_path = strcat('Videos/',session,'/','rp.svg');
 legend
 
-%% Swallowing + breathing visualized
+%% Swallowing + breathing
 % Input time
 % rewardid = 1; rdiff = -1;
 % t = camdata.reward(rewardid,1) + rdiff - 1;
@@ -154,7 +154,7 @@ xlim([time(1) time(length(time))]);
 % Input time
 % rewardid = 1; rdiff = -1;
 % t = camdata.reward(rewardid,1) + rdiff - 1;
-t = 19;
+t = 110;
 floor = time2frame(t,camdata);
 ceiling = min(floor + 1000, size(loc,1));
 time = frame2time(floor:ceiling,camdata);
@@ -211,7 +211,7 @@ hold on
 % plot(emg.time(emgswallow(:,3)),emgswallow(:,4),'ob');
 xlabel('Time (s)')
 ylabel('EMG amplitude (a.u.)')
-xlim([time(1) time(length(time))]); ylim([min(emg.e) max(emg.env)]);
+xlim([time(1) time(length(time))]); ylim([-max(emg.env) max(emg.env)]);
 
 %% Breathing and swallowing
 swins = 0;

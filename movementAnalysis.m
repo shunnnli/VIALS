@@ -1,4 +1,4 @@
-%% Load loc and EMG data
+%% Load data
 disp('----- Load loc and EMG data -----');
 
 sessions = ["11-062019-1"; "11-062119-1"; "11-062219-1"; "11-062419-1"; "11-062819-1";...
@@ -6,9 +6,9 @@ sessions = ["11-062019-1"; "11-062119-1"; "11-062219-1"; "11-062419-1"; "11-0628
     "18-102519-1"; "18-102519-2"; "19-111119-1"; "20-200115-2"; "20-200117-1";...
     "20-200121-1"; "20-200121-2"; "20-200121-3"; "21-012720-1"; "21-013020-1"];
 swallow3303 = ["22-0228-1"; "22-0301-1"; "23-0305-1"];
-swallowemg = ["19-111119-1"; "23-0314-1"; "23-0314-2"];
+swallowemg = ["19-111119-1"; "23-0314-1"; "23-0314-2"; "23-0315-1"];
 
-session = swallowemg(3);
+session = swallow3303(3);
 disp(session);
 
 % Enter analysis window (in seconds)
@@ -24,7 +24,7 @@ stop = Inf;
 
 % Load single session data
 [camdata,loc] = loadLocData(session,start,stop);
-[tp,tpbout,lickbout,skinbout] = loadLocAnalysis(session,loc,camdata,1);
+[tp,tpbout,lickbout,skinbout] = loadLocAnalysis(session,loc,camdata,0);
 emg = loadEMG(start,stop,camdata);
 breathing = loadBreathing(start,stop,camdata);
 
@@ -75,11 +75,11 @@ disp('----- Raster plot of event summary -----');
 rp_path = strcat('Videos/',session,'/','rp.svg');
 legend
 
-%% Swallowing + breathing visualized
+%% Swallowing + breathing
 % Input time
 % rewardid = 1; rdiff = -1;
 % t = camdata.reward(rewardid,1) + rdiff - 1;
-t = 0;
+t = 133;
 floor = time2frame(t,camdata);
 ceiling = min(floor + 1000, size(loc,1));
 time = frame2time(floor:ceiling,camdata);
@@ -91,7 +91,7 @@ pks = find(allpeaks.locs(sliswallow) >= floor & allpeaks.locs(sliswallow) <= cei
 % lici = find(longici(:,3) >= floor & longici(:,4) <= ceiling);
 
 figure
-subplot(4,1,1)
+subplot(3,1,1)
 yyaxis left
 % for i = 1:size(lici) 
 %     xline(frame2time(longici(lici(i),3),camdata),'-b');
@@ -104,7 +104,7 @@ hold on
 plot(frame2time(loc(:,1),camdata),hdiff,'LineWidth',1);
 hold on
 scatter(frame2time(allpeaks.locs(sliswallow),camdata),allpeaks.pks(sliswallow),...
-    36,allpeaks.sli(sliswallow,1),'o','LineWidth',1);
+    36,allpeaks.sli(sliswallow,1),'o','LineWidth',2);
 % scatter(frame2time(allpeaks.locs,camdata),allpeaks.pks,36,...
 %     allpeaks.sli(:,1),'o','LineWidth',1);
 % scatter(frame2time(allpeaks.locs(sliswallow),camdata),allpeaks.pks(sliswallow),'or','LineWidth',1);
@@ -116,22 +116,24 @@ ylabel('Marker height difference (a.u.)')
 
 yyaxis right
 plot(breathing.raw(:,1),breathing.trace);
+hold on 
+yline(0,'--','Color','#B85741');
 ylabel('Breathing (a.u.)')
 xlabel('Time (s)')
 xlim([time(1) time(length(time))]);
 
-subplot(4,1,2)
-plot(breathing.raw(inspiration,1),breathing.trace(inspiration),'Color','#B85741');
-hold on
-plot(breathing.raw(expiration,1),breathing.trace(expiration),'Color','#274E13');
-hold on
-for i = 1:size(pks,1)
-    xline(frame2time(allpeaks.locs(sliswallow(pks(i))),camdata),'-r');
-end
-ylabel('Breathing (a.u.)')
-xlim([time(1) time(length(time))]);
+% subplot(4,1,2)
+% plot(breathing.raw(inspiration,1),breathing.trace(inspiration),'Color','#B85741');
+% hold on
+% plot(breathing.raw(expiration,1),breathing.trace(expiration),'Color','#274E13');
+% hold on
+% for i = 1:size(pks,1)
+%     xline(frame2time(allpeaks.locs(sliswallow(pks(i))),camdata),'-r');
+% end
+% ylabel('Breathing (a.u.)')
+% xlim([time(1) time(length(time))]);
 
-subplot(4,1,3)
+subplot(3,1,2)
 plot(breathing.raw(:,1),breathing.phase);
 hold on
 for i = 1:size(pks,1)
@@ -141,7 +143,7 @@ end
 ylabel('Breathing phase')
 xlim([time(1) time(length(time))]);
 
-subplot(4,1,4)
+subplot(3,1,3)
 plot(breathing.raw(:,1),breathing.frequency);
 hold on
 for i = 1:size(pks,1)
@@ -154,7 +156,7 @@ xlim([time(1) time(length(time))]);
 % Input time
 % rewardid = 1; rdiff = -1;
 % t = camdata.reward(rewardid,1) + rdiff - 1;
-t = 19;
+t = 110;
 floor = time2frame(t,camdata);
 ceiling = min(floor + 1000, size(loc,1));
 time = frame2time(floor:ceiling,camdata);
